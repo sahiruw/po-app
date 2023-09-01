@@ -1,16 +1,19 @@
 import React, { useState, useEffect } from "react";
-import { View, Text, TextInput, Button, StyleSheet } from "react-native";
+import { View, Text, TextInput, Button, StyleSheet, TouchableOpacity } from "react-native";
 import MapView, { Marker } from "react-native-maps";
 import * as Location from "expo-location";
 import { collection, addDoc } from "firebase/firestore";
+import { useTheme } from "../../assets/theme/theme";
+
 // import { db } from "./config/firebase";
 
 const AddAddressScreen = () => {
   const [addressLine1, setAddressLine1] = useState("");
   const [addressLine2, setAddressLine2] = useState("");
   const [city, setCity] = useState("");
-  const [selectedLocation, setSelectedLocation] = useState(null);
+  const [selectedLocation, setSelectedLocation] = useState(userLocation);
   const [userLocation, setUserLocation] = useState(null);
+  var { theme } = useTheme();
 
   useEffect(() => {
     // Get the user's current location
@@ -34,6 +37,14 @@ const AddAddressScreen = () => {
     })();
   }, []);
 
+  const handleMarkerDragEnd = (event) => {
+    setSelectedLocation({
+      latitude: event.nativeEvent.coordinate.latitude,
+      longitude: event.nativeEvent.coordinate.longitude,
+    });
+  };
+
+
   const handleMapPress = (event) => {
     setSelectedLocation({
       latitude: event.nativeEvent.coordinate.latitude,
@@ -48,7 +59,7 @@ const AddAddressScreen = () => {
       return;
     }
 
-    // Save the address and location to the database
+    // Save the address  and location to the database
     // await addDoc(collection(db, "addresses"), {
     //   addressLine1,
     //   addressLine2,
@@ -67,12 +78,11 @@ const AddAddressScreen = () => {
     setCity("");
     // setSelectedLocation(null);
 
-    console.log("Address added successfully!");
+    console.log("Address added  successfully!");
   };
 
   return (
     <View style={styles.container}>
-      <Text>Add Address</Text>
       <TextInput
         style={styles.input}
         placeholder="Address Line 1"
@@ -91,7 +101,6 @@ const AddAddressScreen = () => {
         value={city}
         onChangeText={setCity}
       />
-      <Text>Map:{JSON.stringify( userLocation)}</Text>
       <MapView
         style={styles.map}
         initialRegion={{
@@ -101,11 +110,19 @@ const AddAddressScreen = () => {
           longitudeDelta: 0.0421,
         }}
         onPress={handleMapPress}
+        onMarkerDragEnd= {handleMarkerDragEnd}
+        showsUserLocation={true}
+        userLocationAnnotationTitle={"You are here"}
+        followsUserLocation={true}
+        showsMyLocationButton={true}    
       >
         {selectedLocation && <Marker coordinate={selectedLocation} draggable />}
       </MapView>
-      <Text>Selected Location:</Text>
-      <Button title="Submit" onPress={handleSubmit} />
+      {/* <Button title="Submit" onPress={handleSubmit} style={{ backgroundColor: theme.primaryColor}} /> */}
+      <TouchableOpacity style={[styles.button ,{ backgroundColor: theme.primaryColor}]} onPress={handleSubmit}>
+        <Text>Submit</Text>
+      </TouchableOpacity>
+
     </View>
   );
 };
@@ -118,7 +135,6 @@ const styles = StyleSheet.create({
   input: {
     width: "100%",
     height: 40,
-    borderColor: "gray",
     borderWidth: 1,
     borderRadius: 5,
     marginBottom: 10,
@@ -128,6 +144,13 @@ const styles = StyleSheet.create({
     flex: 1,
     height: 300,
     marginBottom: 10,
+  },
+  button :{
+    paddingVertical: 10,
+    paddingHorizontal: 20,
+    borderRadius: 5,
+    alignItems: "center",
+    justifyContent: "center",
   },
 });
 

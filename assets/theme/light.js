@@ -3,7 +3,7 @@ const lightTheme = {
   primaryColor: '#ff8c42', // Orange color
   backgroundColor: '#FFFFFF', // White background
   lightBackgroundColor: '#f9c784', // Light gray background
-  lightBackgroundColor2: "#fcaf58", // Light gray background
+  lightBackgroundColor3: "#fcaf58", // Light gray background
   someblue: "#4e598c", // Some blue color
   textColor: '#333333', // Dark text color for contrast
   headerBackground: '#FFA500', // Orange header background

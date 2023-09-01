@@ -15,7 +15,7 @@ function BottomBar(props) {
       safeAreaInsets={insets}
       
       style={{
-        backgroundColor: theme.primaryColor, // Set background color to white
+        backgroundColor: theme.lightBackgroundColor3,
         borderTopLeftRadius: 20, // Rounded upper left corner
       }}
       // activeColor="blue"          // Color when selected
