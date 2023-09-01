@@ -5,7 +5,7 @@ import { auth } from "../../config/firebase";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { useTheme } from "../../assets/theme/theme";
 
-const HomeScreen = ({ navigation }) => {
+const SettingsView = ({ navigation }) => {
   var { theme } = useTheme();
 
   const handleLogout = async () => {
@@ -22,7 +22,7 @@ const HomeScreen = ({ navigation }) => {
 
   return (
     <View style={[styles.container, { backgroundColor: theme.backgroundColor }]}>
-      <Text>HomeScreen of the disptch karana ekaa</Text>
+      <Text>HomeScreen of the Postman</Text>
       <Button title="Logout" onPress={handleLogout} />
     </View>
   );
@@ -36,4 +36,5 @@ const styles = StyleSheet.create({
   },
 });
 
-export default HomeScreen;
+
+export default SettingsView;

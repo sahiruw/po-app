@@ -15,6 +15,7 @@ import {
   StyleSheet,
   Dimensions,
 } from "react-native";
+
 import AsyncStorage from "@react-native-async-storage/async-storage";
 
 const LoginScreen = ({navigation}) => {
@@ -25,20 +26,20 @@ const LoginScreen = ({navigation}) => {
 
   const handleLogin = () => {
     signInWithEmailAndPassword(auth, email, password)
-    .then((userCredential) => {
-      var user = userCredential.user;
-      console.log(user.email)
-      AsyncStorage.setItem("keepLoggedIn", "true")
-      AsyncStorage.setItem("user", JSON.stringify(user))
-      console.log("Login Success")
-    })
-    .catch((error) => {
-      var errorCode = error.code;
-      var errorMessage = error.message;
-      alert(errorMessage)
-      console.log("Login Failed", errorMessage)
-    });
-  }
+      .then((userCredential) => {
+        var user = userCredential.user;
+        console.log(user.email);
+        AsyncStorage.setItem("keepLoggedIn", "true");
+        AsyncStorage.setItem("user", JSON.stringify(user)); // Store user data
+        console.log("Login Success");
+      })
+      .catch((error) => {
+        var errorCode = error.code;
+        var errorMessage = error.message;
+        alert(errorMessage);
+        console.log("Login Failed", errorMessage);
+      });
+  };
   return (
     <View style={styles.container}>
       <Image
