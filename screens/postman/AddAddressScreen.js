@@ -5,7 +5,7 @@ import * as Location from "expo-location";
 import { collection, addDoc } from "firebase/firestore";
 import { useTheme } from "../../assets/theme/theme";
 
-// import { db } from "./config/firebase";
+import { db } from "../../config/firebase";
 
 const AddAddressScreen = () => {
   const [addressLine1, setAddressLine1] = useState("");
@@ -118,7 +118,6 @@ const AddAddressScreen = () => {
       >
         {selectedLocation && <Marker coordinate={selectedLocation} draggable />}
       </MapView>
-      {/* <Button title="Submit" onPress={handleSubmit} style={{ backgroundColor: theme.primaryColor}} /> */}
       <TouchableOpacity style={[styles.button ,{ backgroundColor: theme.primaryColor}]} onPress={handleSubmit}>
         <Text>Submit</Text>
       </TouchableOpacity>
