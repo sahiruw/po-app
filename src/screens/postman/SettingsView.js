@@ -14,7 +14,7 @@ const SettingsView = ({ navigation }) => {
       // After signing out, you might want to navigate the user to the login screen
       await AsyncStorage.setItem("keepLoggedIn", "false");
       await AsyncStorage.removeItem("user");
-      navigation.navigate("Login");
+      // navigation.navigate("Login");
     } catch (error) {
       console.error("Error logging out:", error);
     }

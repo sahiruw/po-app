@@ -1,5 +1,5 @@
-import { ThemeProvider } from "./assets/theme/theme";
-import AppNavigator from "./AppNavigator";
+import { ThemeProvider } from "./src/assets/theme/theme";
+import AppNavigator from "./src/navigation/AppNavigator"
 
 
 export default function App() {
