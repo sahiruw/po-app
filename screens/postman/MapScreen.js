@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import {
   View,
   Text,
@@ -9,24 +9,30 @@ import {
 import MapView, { Marker } from "react-native-maps";
 import MapViewDirections from "react-native-maps-directions";
 
-const MAP_API_KEY = "AIzaSyAuYYZazxHt-Kl5vWNfLnfffVrYGDBdgeo"; // Replace with your Google Maps API key
+import Constants from "expo-constants";
+
+const MAP_API_KEY = Constants.expoConfig.gmaps.apiKey;
 
 const MapScreen = () => {
   const [selectedMarker, setSelectedMarker] = useState(null);
-  const [markerColor, setMarkerColor] = useState("blue");
+  const [coordinates, setCoordinates] = useState([]);
 
-  const coordinates = [
-    { latitude: 6.0367, longitude: 80.217 }, // Galle
-    { latitude: 6.0344, longitude: 80.2176 }, // Galle Fort
-    { latitude: 6.0364, longitude: 80.2178 }, // Galle Clock Tower
-    { latitude: 6.0413, longitude: 80.2175 }, // Galle International Cricket Stadium
-    { latitude: 6.0421, longitude: 80.215 }, // Unawatuna Beach
-    { latitude: 6.0233, longitude: 80.2175 }, // Jungle Beach
-    { latitude: 6.0369, longitude: 80.2251 }, // National Maritime Museum
-    { latitude: 6.0331, longitude: 80.2166 }, // Dutch Hospital Shopping Precinct
-    { latitude: 6.0246, longitude: 80.2186 }, // Japanese Peace Pagoda
-    { latitude: 6.0319, longitude: 80.2167 }, // All Saints' Church
-  ];
+  useEffect(() => {
+    // Fetch the coordinates from the API
+    setCoordinates([
+      { latitude: 6.0367, longitude: 80.217 }, // Galle
+      { latitude: 6.0344, longitude: 80.2176 }, // Galle Fort
+      { latitude: 6.0364, longitude: 80.2178 }, // Galle Clock Tower
+      { latitude: 6.0413, longitude: 80.2175 }, // Galle International Cricket Stadium
+      { latitude: 6.0421, longitude: 80.215 }, // Unawatuna Beach
+      { latitude: 6.0233, longitude: 80.2175 }, // Jungle Beach
+      { latitude: 6.0369, longitude: 80.2251 }, // National Maritime Museum
+      { latitude: 6.0331, longitude: 80.2166 }, // Dutch Hospital Shopping Precinct
+      { latitude: 6.0246, longitude: 80.2186 }, // Japanese Peace Pagoda
+      { latitude: 6.0319, longitude: 80.2167 }, // All Saints' Church
+    ]);
+    console.log("Coordinates fetched from API");
+  }, []);
 
   const handleMarkerPress = (index, coord) => {
     setSelectedMarker({ index, ...coord });
@@ -35,13 +41,15 @@ const MapScreen = () => {
   const handleButton1Click = (marker) => {
     // Handle the first button click action here
     console.log("Button 1 clicked for marker:", marker);
-    setMarkerColor("green");
+
+    setCoordinates(
+      coordinates.filter((coord, index) => index !== marker.index)
+    );
   };
 
   const handleButton2Click = (marker) => {
     // Handle the second button click action here
     console.log("Button 2 clicked for marker:", marker);
-    setMarkerColor("grey");
   };
 
   const handleOpenInMaps = () => {
@@ -63,19 +71,19 @@ const MapScreen = () => {
       <MapView
         style={styles.map}
         initialRegion={{
-          latitude: coordinates[0].latitude,
-          longitude: coordinates[0].longitude,
+          latitude: coordinates[0] ? coordinates[0].latitude : 6.0367,
+          longitude: coordinates[0] ? coordinates[0].longitude : 80.217,
           latitudeDelta: 0.0922,
           longitudeDelta: 0.0421,
         }}
+        showsUserLocation={true}
       >
-        {coordinates.map((coord, index) => (
+        {coordinates.length > 0 && coordinates.map((coord, index) => (
           <Marker
             key={index}
             coordinate={coord}
             title={`Point ${index + 1}`}
             onPress={() => handleMarkerPress(index, coord)}
-            pinColor={index === selectedMarker?.index ? markerColor : "blue"}
           />
         ))}
 
@@ -86,7 +94,7 @@ const MapScreen = () => {
             destination={coordinates[coordinates.length - 1]}
             apikey={MAP_API_KEY}
             strokeWidth={3}
-            strokeColor="blue"
+            strokeColor="grey"
           />
         )}
       </MapView>

@@ -9,7 +9,6 @@ const HomeScreen = ({ navigation }) => {
   return (
     <View style={[styles.container, { backgroundColor: theme.backgroundColor }]}>
       <Text>HomeScreen of the Postman</Text>
-
     </View>
   );
 };

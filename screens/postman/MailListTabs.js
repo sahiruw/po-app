@@ -74,7 +74,6 @@ const MailListTabs = ({ mailList }) => {
           <View style={styles.modalContent}>
             <Text>Name: {selectedMail.name}</Text>
             <Text>Status: {selectedMail.status}</Text>
-            {/* Add more details here */}
             <TouchableOpacity onPress={closeMailDetails} style={styles.closeButton}>
               <Text>Close</Text>
             </TouchableOpacity>
@@ -113,7 +112,6 @@ const styles = StyleSheet.create({
     marginBottom: 10,
     borderRadius: 5,
     backgroundColor: '#f0f0f0',
-    n
   },
   modal: {
     justifyContent: 'flex-end',

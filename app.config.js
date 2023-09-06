@@ -35,5 +35,8 @@ export default {
       appId: process.env.APP_ID,
       measurementId: process.env.MEASUREMENT_ID,
     },
+    gmaps: {
+      apiKey: process.env.GMAPS_API_KEY,
+    },
   },
 };
