@@ -1,29 +1,21 @@
-import React from "react";
-import { View, Button, StyleSheet, Text } from "react-native";
-import { signOut } from "firebase/auth";
-import { auth } from "../../config/firebase";
-import AsyncStorage from "@react-native-async-storage/async-storage";
-import { useTheme } from "../../assets/theme/theme";
+import React from 'react';
+import { View, StyleSheet } from 'react-native';
+import MailListTabs from './MailListTabs'; // Import the MailListView component
 
-const MailListViewScreen = ({ navigation }) => {
-  var { theme } = useTheme();
-
-  const handleLogout = async () => {
-    try {
-      await signOut(auth);
-      // After signing out, you might want to navigate the user to the login screen
-      await AsyncStorage.setItem("keepLoggedIn", "false");
-      await AsyncStorage.removeItem("user");
-      navigation.navigate("Login");
-    } catch (error) {
-      console.error("Error logging out:", error);
-    }
-  };
+const SampleMailList = () => {
+  // Sample mailList data
+  const mailList = [
+    { id: 1, name: 'Mail 1', status: 'In progress' },
+    { id: 2, name: 'Mail 2', status: 'Delivered' },
+    { id: 3, name: 'Mail 3', status: 'Delivery Failed' },
+    { id: 4, name: 'Mail 4', status: 'In progress' },
+    { id: 5, name: 'Mail 5', status: 'Delivered' },
+    { id: 6, name: 'Mail 6', status: 'Delivery Failed' },
+  ];
 
   return (
-    <View style={[styles.container, { backgroundColor: theme.backgroundColor }]}>
-      <Text>HomeScreen of the Postman</Text>
-      <Button title="Logout" onPress={handleLogout} />
+    <View style={styles.container}>
+      <MailListTabs mailList={mailList} /> 
     </View>
   );
 };
@@ -31,10 +23,9 @@ const MailListViewScreen = ({ navigation }) => {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    justifyContent: "center",
-    alignItems: "center",
+    backgroundColor: '#fff',
+    padding: 16,
   },
 });
 
-
-export default MailListViewScreen;
+export default SampleMailList;
