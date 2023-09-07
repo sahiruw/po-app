@@ -3,7 +3,7 @@ import React from "react";
 import PostmanHomeScreen from "../screens/postman/HomeScreen";
 import PostmanBottomBar from "../screens/postman/BottomBar";
 import AddAddressScreen from "../screens/postman/AddAddressScreen";
-import MailListViewScreen from "../screens/postman/MailListViewScreen";
+import MailListTabs from "../screens/postman/MailListTabs";
 import SettingsView from "../screens/postman/SettingsView";
 import MapScreen from "../screens/postman/MapScreen";
 
@@ -71,7 +71,7 @@ function PostmanStack() {
   
         <Stack.Screen
           name="Mail List"
-          component={MailListViewScreen}
+          component={MailListTabs}
           options={{
             tabBarLabel: "Mail List",
             tabBarIcon: ({ color, size }) => {
