@@ -60,6 +60,7 @@ function RootNavigator() {
 
   useEffect(() => {
     //get user from async
+    setLoading(true);
     const getUser = async () => {
       let user = await AsyncStorage.getItem("user");
       console.log("User from async", user);
@@ -68,6 +69,7 @@ function RootNavigator() {
       }
     };
     getUser();
+    setLoading(false);
   }, []);
 
 
