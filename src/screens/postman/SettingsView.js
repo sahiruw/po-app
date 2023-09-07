@@ -15,6 +15,7 @@ const SettingsView = ({ navigation }) => {
       await AsyncStorage.setItem("keepLoggedIn", "false");
       await AsyncStorage.removeItem("user");
       // navigation.navigate("Login");
+      console.log("User signed out");
     } catch (error) {
       console.error("Error logging out:", error);
     }

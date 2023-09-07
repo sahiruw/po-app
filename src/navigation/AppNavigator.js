@@ -15,6 +15,9 @@ import PostmanStack from "./PostmanNavigator";
 import DispatcherStack from "./Dispatchernavigation";
 import AuthStack from "./LoginNavigator";
 
+import {getUserData} from "../utils/authUtils";
+import { get } from "react-native/Libraries/TurboModule/TurboModuleRegistry";
+
 const AuthContext = createContext({});
 
 const AuthProvider = ({ children }) => {
@@ -31,54 +34,42 @@ function RootNavigator() {
   const [loading, setLoading] = useState(true);
   const [isLoggedIn, setIsLoggedIn] = useState(false);
 
-  const setUserData = async (authenticatedUser) => {
-    setLoading(true);
-    if (!isLoggedIn && authenticatedUser) {
-      const docRef = doc(db, "employees", authenticatedUser.uid);
-      const docSnap = await getDoc(docRef);
-
-      if (docSnap.exists()) {
-        console.log("Document data:", docSnap.data());
-        //set user with data merge with previous data
-        setUser({ ...authenticatedUser, ...docSnap.data() });
-      } else {
-        // docSnap.data() will be undefined in this case
-        console.log("No sch document!");
-      }
-    }
-    setLoading(false);
-  };
-
   useEffect(() => {
     const unsubscribe = onAuthStateChanged(auth, async (authenticatedUser) => {
+      setLoading(true);
+
       if (authenticatedUser) {
-        await setUserData(authenticatedUser);
+        console.log("User is authenticated");
+        const uid = authenticatedUser.uid;
+        let userData = await getUserData(uid);
+        console.log("User Data", userData);
+        await AsyncStorage.setItem("user", JSON.stringify(userData));
+        setUser(userData);
+        setIsLoggedIn(true);
       } else {
+        
+        console.log("User is not authenticated");
         setUser(null);
+        setIsLoggedIn(false);
       }
+
       setLoading(false);
     });
     return () => unsubscribe();
   }, []);
 
   useEffect(() => {
-    const _retrieveData = () => {
-      try {
-        AsyncStorage.getItem("keepLoggedIn").then((value) => {
-          if (value == "true") {
-            setIsLoggedIn(true);
-          }
-        });
-
-        AsyncStorage.getItem("user").then((value) => {
-          setUserData(JSON.parse(value));
-        });
-      } catch (error) {
-        console.log(error);
+    //get user from async
+    const getUser = async () => {
+      let user = await AsyncStorage.getItem("user");
+      console.log("User from async", user);
+      if (user !== null) {
+        setUser(JSON.parse(user));
       }
     };
-    _retrieveData();
+    getUser();
   }, []);
+
 
   if (loading) {
     return <LoadingScreen />;

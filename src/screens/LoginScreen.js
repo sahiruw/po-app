@@ -1,15 +1,14 @@
-import React, {useState} from "react";
+import React, { useState } from "react";
 import { useTheme } from "../assets/theme/theme";
-
 
 import { signInWithEmailAndPassword } from "firebase/auth";
 import { auth, db } from "../config/firebase";
-
+import { doc, getDoc } from "firebase/firestore";
 
 import {
   View,
   Text,
-  TextInput, 
+  TextInput,
   TouchableOpacity,
   Image,
   StyleSheet,
@@ -18,27 +17,28 @@ import {
 
 import AsyncStorage from "@react-native-async-storage/async-storage";
 
-const LoginScreen = ({navigation}) => {
+
+const LoginScreen = ({ navigation }) => {
   const { width, height } = Dimensions.get("window");
   const { theme } = useTheme();
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
 
-  const handleLogin = () => {
-    signInWithEmailAndPassword(auth, email, password)
-      .then((userCredential) => {
-        var user = userCredential.user;
-        console.log(user.email);
-        AsyncStorage.setItem("keepLoggedIn", "true");
-        AsyncStorage.setItem("user", JSON.stringify(user)); // Store user data
-        console.log("Login Success");
-      })
-      .catch((error) => {
-        var errorCode = error.code;
-        var errorMessage = error.message;
-        alert(errorMessage);
-        console.log("Login Failed", errorMessage);
-      });
+
+
+  const handleLogin = async () => {
+    try {
+      const userCredential = await signInWithEmailAndPassword(auth, email, password);
+      const userID = userCredential.user.uid;
+      console.log("User ID", userID);
+      
+  
+      await AsyncStorage.setItem("keepLoggedIn", "true");
+    } catch (error) {
+      const errorMessage = error.message;
+      alert(errorMessage);
+      console.log("Login Failed", errorMessage);
+    }
   };
   return (
     <View style={styles.container}>
