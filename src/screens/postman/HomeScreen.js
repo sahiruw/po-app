@@ -1,7 +1,8 @@
 import React, { useEffect, useState } from "react";
 import { View, Button, StyleSheet, Text } from "react-native";
 import { useTheme } from "../../assets/theme/theme";
-import AsyncStorage from "@react-native-async-storage/async-storage";
+import userService from "../../services/userService"
+import routeService from "../../services/routeService"
 
 const HomeScreen = ({ navigation }) => {
   var { theme } = useTheme();
@@ -9,11 +10,8 @@ const HomeScreen = ({ navigation }) => {
 
   useEffect(() => {
     async function getUser() {
-      let user = await AsyncStorage.getItem("user");
-      console.log("User from async", user);
-      if (user !== null) {
-        setUser(JSON.parse(user));
-      }
+      let user = await userService.getUserData();
+      setUser(user);
     }
     getUser();
   }, []);
@@ -21,8 +19,7 @@ const HomeScreen = ({ navigation }) => {
   return (
     <View style={[styles.container, { backgroundColor: theme.backgroundColor }]}>
       <Text>HomeScreen of the Postman</Text>
-
-      <Text>{JSON.stringify(user)}</Text>
+      <Text>{JSON.stringify(routeService.getRouteForToday())}</Text>
     </View>
   );
 };

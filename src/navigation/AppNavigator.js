@@ -4,10 +4,7 @@ import React, { useState, createContext, useContext, useEffect } from "react";
 import { NavigationContainer } from "@react-navigation/native";
 
 import { onAuthStateChanged } from "firebase/auth";
-import { auth, db } from "../config/firebase";
-import { doc, getDoc } from "firebase/firestore";
-import AsyncStorage from "@react-native-async-storage/async-storage";
-import { createBottomTabNavigator } from "@react-navigation/bottom-tabs";
+import { auth } from "../config/firebase";
 
 import LoadingScreen from "../screens/LoadingScreen";
 
@@ -15,8 +12,7 @@ import PostmanStack from "./PostmanNavigator";
 import DispatcherStack from "./Dispatchernavigation";
 import AuthStack from "./LoginNavigator";
 
-import {getUserData} from "../utils/authUtils";
-import { get } from "react-native/Libraries/TurboModule/TurboModuleRegistry";
+import userService from "../services/userService";
 
 const AuthContext = createContext({});
 
@@ -32,7 +28,6 @@ const AuthProvider = ({ children }) => {
 function RootNavigator() {
   const { user, setUser } = useContext(AuthContext);
   const [loading, setLoading] = useState(true);
-  const [isLoggedIn, setIsLoggedIn] = useState(false);
 
   useEffect(() => {
     const unsubscribe = onAuthStateChanged(auth, async (authenticatedUser) => {
@@ -41,16 +36,13 @@ function RootNavigator() {
       if (authenticatedUser) {
         console.log("User is authenticated");
         const uid = authenticatedUser.uid;
-        let userData = await getUserData(uid);
-        console.log("User Data", userData);
-        await AsyncStorage.setItem("user", JSON.stringify(userData));
+        let userData = await userService.getUserData(uid);
+        // console.log("User Data", userData);
         setUser(userData);
-        setIsLoggedIn(true);
       } else {
         
         console.log("User is not authenticated");
         setUser(null);
-        setIsLoggedIn(false);
       }
 
       setLoading(false);
@@ -62,10 +54,10 @@ function RootNavigator() {
     //get user from async
     setLoading(true);
     const getUser = async () => {
-      let user = await AsyncStorage.getItem("user");
-      console.log("User from async", user);
+      let user = await userService.getUserData();
+      // console.log("User from async", user);
       if (user !== null) {
-        setUser(JSON.parse(user));
+        setUser(user);
       }
     };
     getUser();

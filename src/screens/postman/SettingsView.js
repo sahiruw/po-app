@@ -2,8 +2,11 @@ import React from "react";
 import { View, Button, StyleSheet, Text } from "react-native";
 import { signOut } from "firebase/auth";
 import { auth } from "../../config/firebase";
-import AsyncStorage from "@react-native-async-storage/async-storage";
+
 import { useTheme } from "../../assets/theme/theme";
+
+// import userService from "../../services/userService";
+import AsyncStorage from "@react-native-async-storage/async-storage";
 
 const SettingsView = ({ navigation }) => {
   var { theme } = useTheme();
@@ -11,10 +14,9 @@ const SettingsView = ({ navigation }) => {
   const handleLogout = async () => {
     try {
       await signOut(auth);
-      // After signing out, you might want to navigate the user to the login screen
-      await AsyncStorage.setItem("keepLoggedIn", "false");
       await AsyncStorage.removeItem("user");
-      // navigation.navigate("Login");
+      // await userService.removeUserData();
+      navigation.navigate("Postman Home");
       console.log("User signed out");
     } catch (error) {
       console.error("Error logging out:", error);
