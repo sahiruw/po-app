@@ -1,11 +1,10 @@
 import React, { useState, useEffect } from "react";
 import { View, Text, TextInput, Button, StyleSheet, TouchableOpacity } from "react-native";
 import MapView, { Marker } from "react-native-maps";
-import * as Location from "expo-location";
-import { collection, addDoc } from "firebase/firestore";
 import { useTheme } from "../../assets/theme/theme";
 
-import { db } from "../../config/firebase";
+import addressUtils from "../../utils/addressUtils";
+
 
 const AddAddressScreen = () => {
   const [addressLine1, setAddressLine1] = useState("");
@@ -18,22 +17,9 @@ const AddAddressScreen = () => {
   useEffect(() => {
     // Get the user's current location
     (async () => {
-      let { status } = await Location.requestForegroundPermissionsAsync();
-      if (status !== "granted") {
-        console.log("Permission to access location was denied");
-        return;
-      }
-
-      let location = await Location.getCurrentPositionAsync({});
-      const { latitude, longitude } = location.coords;
-      setUserLocation({
-        latitude,
-        longitude,
-      });
-      setSelectedLocation({
-        latitude,
-        longitude,
-      });
+      let userloc = await addressUtils.getUserLocation();
+      setSelectedLocation(userloc);
+      setUserLocation(userloc);
     })();
   }, []);
 

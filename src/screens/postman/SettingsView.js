@@ -15,7 +15,12 @@ const SettingsView = ({ navigation }) => {
     try {
       await signOut(auth);
       await AsyncStorage.removeItem("user");
+      
       // await userService.removeUserData();
+      //wait for 1 second
+      setTimeout(() => {
+        console.log("Waited 1 second");
+      }, 1000);
       navigation.navigate("Postman Home");
       console.log("User signed out");
     } catch (error) {

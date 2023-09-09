@@ -35,4 +35,5 @@ async function removeUserData() {
 
 export default {
   getUserData,
+  removeUserData
 };

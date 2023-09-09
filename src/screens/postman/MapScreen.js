@@ -5,37 +5,64 @@ import {
   StyleSheet,
   TouchableOpacity,
   Linking,
+  Switch,
 } from "react-native";
 import MapView, { Marker } from "react-native-maps";
 import MapViewDirections from "react-native-maps-directions";
 
 import Constants from "expo-constants";
+import routeService from "../../services/routeService";
+import addressUtils from "../../utils/addressUtils";
+
+import SignatureScreen from "../../components/SignatureScreen";
+import NoteScreen from "../../components/NoteScreen";
 
 const MAP_API_KEY = Constants.expoConfig.gmaps.apiKey;
 
 const MapScreen = () => {
   const [selectedMarker, setSelectedMarker] = useState(null);
   const [coordinates, setCoordinates] = useState([]);
+  const [mailItems, setMailItems] = useState([]);
+
+  const [isMailDelivered, setIsMailDelivered] = useState(false);
+  const [signatureImage, setSignatureImage] = useState(null);
+  const [note, setNote] = useState("");
 
   useEffect(() => {
     // Fetch the coordinates from the API
-    setCoordinates([
-      { latitude: 6.0367, longitude: 80.217 }, // Galle
-      { latitude: 6.0344, longitude: 80.2176 }, // Galle Fort
-      { latitude: 6.0364, longitude: 80.2178 }, // Galle Clock Tower
-      { latitude: 6.0413, longitude: 80.2175 }, // Galle International Cricket Stadium
-      { latitude: 6.0421, longitude: 80.215 }, // Unawatuna Beach
-      { latitude: 6.0233, longitude: 80.2175 }, // Jungle Beach
-      { latitude: 6.0369, longitude: 80.2251 }, // National Maritime Museum
-      { latitude: 6.0331, longitude: 80.2166 }, // Dutch Hospital Shopping Precinct
-      { latitude: 6.0246, longitude: 80.2186 }, // Japanese Peace Pagoda
-      { latitude: 6.0319, longitude: 80.2167 }, // All Saints' Church
-    ]);
-    console.log("Coordinates fetched from API");
+    const fetchCoordinates = async () => {
+      let route = await routeService.getRouteForToday();
+      setMailItems(route.mailItemData);
+      let userloc = await addressUtils.getUserLocation();
+      let coordinatesTemp = [userloc];
+      for (let mail of route.mailItemData) {
+        let location = mail.receiver_address.Location;
+        coordinatesTemp.push({
+          latitude: location[0],
+          longitude: location[1],
+        });
+      }
+      setCoordinates(coordinatesTemp);
+    };
+    fetchCoordinates();
+    console.log("Coordinates fet ched from API");
   }, []);
 
+  const handleSaveSignature = (signature) => {
+    // Handle saving the signature image
+    setSignatureImage(signature);
+    setSignatureVisible(false);
+  };
+
+  const handleSaveNote = (userNote) => {
+    // Handle saving the user's note
+    setNote(userNote);
+    setNoteVisible(false);
+  };
+
   const handleMarkerPress = (index, coord) => {
-    setSelectedMarker({ index, ...coord });
+    setSelectedMarker({ index, ...mailItems[index] });
+    setIsMailDelivered(false);
   };
 
   const handleButton1Click = (marker) => {
@@ -68,6 +95,7 @@ const MapScreen = () => {
 
   return (
     <View style={styles.container}>
+      <Text>{JSON.stringify(selectedMarker)}</Text>
       <MapView
         style={styles.map}
         initialRegion={{
@@ -78,14 +106,15 @@ const MapScreen = () => {
         }}
         showsUserLocation={true}
       >
-        {coordinates.length > 0 && coordinates.map((coord, index) => (
-          <Marker
-            key={index}
-            coordinate={coord}
-            title={`Point ${index + 1}`}
-            onPress={() => handleMarkerPress(index, coord)}
-          />
-        ))}
+        {coordinates.length > 0 &&
+          coordinates.map((coord, index) => (
+            <Marker
+              key={index}
+              coordinate={coord}
+              title={`Point ${index + 1}`}
+              onPress={() => handleMarkerPress(index, coord)}
+            />
+          ))}
 
         {coordinates.length > 1 && (
           <MapViewDirections
@@ -102,20 +131,43 @@ const MapScreen = () => {
       {selectedMarker !== null && (
         <>
           <View style={styles.markerInfo}>
-            <Text>Latitude: {selectedMarker.latitude}</Text>
-            <Text>Longitude: {selectedMarker.longitude}</Text>
+            <Text style={{ fontWeight: "bold" }}>
+              {`${selectedMarker.receiver_name.first_name} ${selectedMarker.receiver_name.mid_name} ${selectedMarker.receiver_name.last_name}`}
+            </Text>
+            <Text>
+              {`No: ${addressUtils.formatAddress(
+                selectedMarker.receiver_address
+              )}`}
+            </Text>
+            <View
+              style={{
+                flexDirection: "row",
+                alignItems: "center",
+                marginTop: 16,
+              }}
+            >
+              <Text style={{ marginRight: 8 }}>Is the mail delivered?</Text>
+              <Switch
+                value={isMailDelivered}
+                onValueChange={(value) => setIsMailDelivered(value)}
+              />
+            </View>
+            {/* <SignatureScreen
+              isVisible={isMailDelivered}
+              onSave={handleSaveSignature}
+              // onCancel={() => setSignatureVisible(false)}
+
+            /> */}
+
             <TouchableOpacity
               onPress={() => handleButton1Click(selectedMarker)}
               style={styles.button}
             >
-              <Text>Button 1</Text>
+              <Text>
+                Mark as {isMailDelivered ? "Delivered" : "Not Delivered"}
+              </Text>
             </TouchableOpacity>
-            <TouchableOpacity
-              onPress={() => handleButton2Click(selectedMarker)}
-              style={styles.button}
-            >
-              <Text>Button 2</Text>
-            </TouchableOpacity>
+
             <TouchableOpacity
               onPress={() => handleOpenInMaps()}
               style={styles.openInMapsButton}

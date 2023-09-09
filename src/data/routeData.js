@@ -2,37 +2,45 @@ import AsyncStorage from "@react-native-async-storage/async-storage";
 import { doc, getDoc } from "firebase/firestore";
 import { auth, db } from "../config/firebase";
 
-const getRoute = async (dateKey, uid) => {
-  let route = await AsyncStorage.getItem("route");
+import mailItemData from "./mailItemData";
+import addressData from "./addressData";
 
-  if (route?.dateKey === dateKey && route?.uid === uid) {
-    console.log("route from  async", route);
-    return JSON.parse(route);
+const getRoute = async (dateKey, uid) => {
+  let routeRaw = await AsyncStorage.getItem("route");
+  let routeStored = JSON.parse(routeRaw);
+
+  if (routeStored?.dateKey === dateKey) {
+    console.log("route from  async");
+    return routeStored;
   } else {
-    //get route from firebase
-    console.log(dateKey, uid);
+    console.log("reading route from firebase");
+    let mailsForToday = [];
+
     const docRef = doc(db, "Route", dateKey);
     const docSnap = await getDoc(docRef);
     if (docSnap.exists()) {
       routeIDS = docSnap.data();
-      let mailItemData = [];
-
       if (routeIDS) {
-        for (let mail of routes.mails) {
-          let maildata = await mailItemService.getDetailsofMailItem(mail);
+        for (let mail of routeIDS.mails) {
+          let maildata = await mailItemData.getDetailsofMailItem(mail);
+          let recipientAddress = await addressData.getDetailsofAddress(
+            maildata.receiver_address_id
+          );
+          maildata.receiver_address = recipientAddress;
           if (maildata) {
-            mailItemData.push(maildata);
+            mailsForToday.push(maildata);
           }
         }
-      }
-      console.log("routes", mailItemData);
 
-      let route = { dateKey, uid, mailItemData };
+      }
+
+      let route = { dateKey, uid, mailItemData: mailsForToday };
+      // console.log("route from firebase", route);
       saveRoute(route);
       return route;
     }
     console.log("No route document!");
-    return null;
+    return { dateKey, uid, mailItemData: mailsForToday };
   }
 };
 
