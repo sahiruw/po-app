@@ -12,10 +12,15 @@ import { useTheme } from "../assets/theme/theme";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { useNavigation } from "@react-navigation/core";
 import userService from "../services/userService";
+import userUtils from "../utils/userUtils";
 
 const SettingsView = () => {
   var { theme } = useTheme();
   const [user, setUser] = useState(null);
+
+  clearAsyncStorage = async() => {
+    AsyncStorage.removeItem("route");
+}
 
   useEffect(() => {
     const getUserData = async () => {
@@ -56,12 +61,10 @@ const SettingsView = () => {
       {/* Replace with actual user data */}
       <View style={styles.userInfo}>
         <Avatar.Image source={require("./profile.jpg")} size={100} />
-        <Text>Name: John Doe</Text>
-        <Text>Email: johndoe@example.com</Text>
-        <Text>Role: User</Text>
+        <Text>Name: {userUtils.formatName(user?.name)}</Text>
+        <Text>Email: {user?.email}</Text>
+        <Text>Role: {user?.role}</Text>
       </View>
-
-      {/* Action List */}
       <TouchableOpacity
         style={styles.actionItem}
         onPress={() => navigation.navigate("EditProfile")}
@@ -70,6 +73,9 @@ const SettingsView = () => {
       </TouchableOpacity>
       <TouchableOpacity style={styles.actionItem}>
         <Text>Show Statistics</Text>
+      </TouchableOpacity>
+      <TouchableOpacity style={styles.actionItem} onPress={clearAsyncStorage }>
+        <Text>Clear Cache</Text>
       </TouchableOpacity>
       <TouchableOpacity style={styles.actionItem} onPress={handleLogout}>
         <Text>Logout</Text>

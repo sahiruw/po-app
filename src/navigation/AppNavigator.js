@@ -34,9 +34,9 @@ function RootNavigator() {
       setLoading(true);
 
       if (authenticatedUser) {
-        console.log("User is authenticated");
+        console.log("User is authenticated", authenticatedUser);
         const uid = authenticatedUser.uid;
-        let userData = await userService.getUserData(uid);
+        let userData = await userService.getUserData(uid, authenticatedUser.email);
         // console.log("User Data", userData);
         setUser(userData);
       } else {

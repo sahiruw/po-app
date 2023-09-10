@@ -14,10 +14,15 @@ const LoadingScreen = () => {
 
 const styles = StyleSheet.create({
   container: {
-    flex: 1,
+    
+    position: "absolute",
+    width: "100%",
+    height: "100%",
+
     justifyContent: "center",
     alignItems: "center",
     backgroundColor: "rgba(0, 0, 0, 0.5)", // Semi-transparent background
+    zIndex: 100, // Make sure the activity indicator is on top
   },
   loadingContainer: {
     backgroundColor: "white",

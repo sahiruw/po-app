@@ -1,8 +1,8 @@
 
 import userData from "../data/userData";
 
-const getUserData = async (uid) => {
-    let user = await userData.getUserData(uid);
+const getUserData = async (uid, email) => {
+    let user = await userData.getUserData(uid, email);
     return user;
 }
 

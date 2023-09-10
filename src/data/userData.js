@@ -2,7 +2,7 @@ import AsyncStorage from "@react-native-async-storage/async-storage";
 import { doc, getDoc } from "firebase/firestore";
 import { auth, db } from "../config/firebase";
 
-async function getUserData(uid) {
+async function getUserData(uid, email) {
   let user = await AsyncStorage.getItem("user");
 
   if (user) {
@@ -14,8 +14,8 @@ async function getUserData(uid) {
 
       if (docSnap.exists()) {
         // console.log("Document data:", docSnap.data());
-        user = { uid, ...docSnap.data() }
-        saveUserdata(user)
+        user = { uid, email, ...docSnap.data() };
+        saveUserdata(user);
         return user;
       }
     }
@@ -26,7 +26,7 @@ async function getUserData(uid) {
 }
 
 async function saveUserdata(user) {
-    await AsyncStorage.setItem("user", JSON.stringify(user));
+  await AsyncStorage.setItem("user", JSON.stringify(user));
 }
 
 async function removeUserData() {
@@ -35,5 +35,5 @@ async function removeUserData() {
 
 export default {
   getUserData,
-  removeUserData
+  removeUserData,
 };

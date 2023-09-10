@@ -17,6 +17,7 @@ import addressUtils from "../../utils/addressUtils";
 
 import { SketchCanvas, SketchCanvasRef } from "rn-perfect-sketch-canvas";
 import AppbarC from "../../components/AppBarC";
+import LoadingScreen from "../LoadingScreen";
 
 const MAP_API_KEY = Constants.expoConfig.gmaps.apiKey;
 
@@ -29,9 +30,12 @@ const MapScreen = () => {
   const [showSubmit, setShowSubmit] = useState(false);
   const [note, setNote] = useState("");
 
+  const [isLoading, setIsLoading] = useState(false);
+
   const canvasRef = useRef();
 
   useEffect(() => {
+    setIsLoading(true);
     // Fetch the coordinates from the API
     const fetchCoordinates = async () => {
       let route = await routeService.getRouteForToday();
@@ -46,10 +50,12 @@ const MapScreen = () => {
         });
       }
       setCoordinates(coordinatesTemp);
+
     };
     fetchCoordinates();
-    console.log("Coordinates fet ched from API");
-  }, []);
+    console.log("Coordinates fetched from API");
+    setIsLoading(false);
+  }, [coordinates.length]);
 
   const handleMarkerPress = (index, coord) => {
     setSelectedMarker({ index, ...mailItems[index - 1] });
@@ -62,9 +68,9 @@ const MapScreen = () => {
     // Handle the first button click action here
     console.log("Button 1 clicked for marker:", marker);
     setShowSubmit(true);
-    // setCoordinates(
-    //   coordinates.filter((coord, index) => index !== marker.index)
-    // );
+    setCoordinates(
+      coordinates.filter((coord, index) => index !== marker.index)
+    );
   };
 
   const handleSubmit = () => {
@@ -87,12 +93,19 @@ const MapScreen = () => {
     setSelectedMarker(null);
   };
 
+  // if (isLoading) {
+  //   return <LoadingScreen />;
+  // }
+
   if (!showSubmit) {
     return (
       <>
         <AppbarC title="Map" />
+        {isLoading && <LoadingScreen />}
+
         <View style={styles.container}>
           {/* <Text>{JSON.stringify(selectedMarker)}</Text> */}
+         
           <MapView
             style={styles.map}
             initialRegion={{
@@ -139,6 +152,8 @@ const MapScreen = () => {
             )}
           </MapView>
 
+          
+          
           {selectedMarker?.receiver_address_id && (
             <>
               <View style={styles.markerInfo}>
@@ -297,6 +312,7 @@ const styles = StyleSheet.create({
     alignItems: "center",
     zIndex: 1, // Ensure the popup is above the overlay
   },
+
   sign: {
     zIndex: 2, // Ensure the popup is above the overlay
   },
