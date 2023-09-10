@@ -18,8 +18,33 @@ const HomeScreen = ({ navigation }) => {
 
   return (
     <View style={[styles.container, { backgroundColor: theme.backgroundColor }]}>
-      <Text>HomeScreen of the Postman</Text>
-      <Text>{JSON.stringify(routeService.getRouteForToday())}</Text>
+      {/* <Text>HomeScreen of the Postman</Text> */}
+      <ModernDateTimeDisplay />
+    </View>
+  );
+};
+
+
+const ModernDateTimeDisplay = () => {
+  const [currentDateTime, setCurrentDateTime] = useState(new Date());
+
+  useEffect(() => {
+    // Update the current date and time every second
+    const intervalId = setInterval(() => {
+      setCurrentDateTime(new Date());
+    }, 1000);
+
+    // Clear the interval when the component unmounts
+    return () => clearInterval(intervalId);
+  }, []);
+
+  const formattedDate = currentDateTime.toLocaleDateString();
+  const formattedTime = currentDateTime.toLocaleTimeString();
+
+  return (
+    <View style={styles.clockContainer}>
+      <Text style={styles.dateText}>{formattedDate}</Text>
+      <Text style={styles.timeText}>{formattedTime}</Text>
     </View>
   );
 };
@@ -29,6 +54,18 @@ const styles = StyleSheet.create({
     flex: 1,
     justifyContent: "center",
     alignItems: "center",
+  },
+
+  clockContainer: {
+    alignItems: 'center',
+  },
+  dateText: {
+    fontSize: 24,
+    fontWeight: 'bold',
+    marginBottom: 8,
+  },
+  timeText: {
+    fontSize: 32,
   },
 });
 
