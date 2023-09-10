@@ -1,7 +1,7 @@
 import React from "react";
 import { View, Text, TouchableOpacity, StyleSheet } from "react-native";
 
-import AppBarC from "../../components/AppBarC";
+import AppBarC from "../components/AppBarC";
 
 const EditProfileScreen = () => {
   return (

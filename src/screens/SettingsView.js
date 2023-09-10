@@ -2,16 +2,16 @@
 import React, { useEffect, useState } from "react";
 import { View, Text, TouchableOpacity, StyleSheet } from "react-native";
 import { Avatar } from "react-native-paper";
-import AppBarC from "../../components/AppBarC";
+import AppBarC from "../components/AppBarC";
 
 import { signOut } from "firebase/auth";
-import { auth } from "../../config/firebase";
+import { auth } from "../config/firebase";
 
-import { useTheme } from "../../assets/theme/theme";
+import { useTheme } from "../assets/theme/theme";
 
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { useNavigation } from "@react-navigation/core";
-import userService from "../../services/userService";
+import userService from "../services/userService";
 
 const SettingsView = () => {
   var { theme } = useTheme();

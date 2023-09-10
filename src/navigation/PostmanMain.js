@@ -1,10 +1,10 @@
 import React from "react";
 
 import PostmanHomeScreen from "../screens/postman/HomeScreen";
-import PostmanBottomBar from "../screens/postman/BottomBar";
+import PostmanBottomBar from "../screens/BottomBar";
 import AddAddressScreen from "../screens/postman/AddAddressScreen";
 import MailListTabs from "../screens/postman/MailListTabs";
-import SettingsView from "../screens/postman/SettingsView";
+import SettingsView from "../screens/SettingsView";
 import MapScreen from "../screens/postman/MapScreen";
 
 import { createBottomTabNavigator } from "@react-navigation/bottom-tabs";

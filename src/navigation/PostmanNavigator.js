@@ -2,7 +2,7 @@
 import React from 'react';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import MainStack from './PostmanMain';
-import EditProfileScreen from "../screens/postman/EditProfileScreen"
+import EditProfileScreen from "../screens/EditProfileScreen"
 import LoginScreen from "../screens/LoginScreen"
 const Stack = createNativeStackNavigator();
 

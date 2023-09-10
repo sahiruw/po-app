@@ -2,7 +2,7 @@ import React from "react";
 
 import { BottomNavigation } from "react-native-paper";
 import { CommonActions } from "@react-navigation/core";
-import { useTheme } from "../../assets/theme/theme";
+import { useTheme } from "../assets/theme/theme";
 
 function BottomBar(props) {
   var { navigation, state, descriptors, insets } = props.navData;
