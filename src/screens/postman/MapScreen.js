@@ -16,7 +16,7 @@ import routeService from "../../services/routeService";
 import addressUtils from "../../utils/addressUtils";
 
 import { SketchCanvas, SketchCanvasRef } from "rn-perfect-sketch-canvas";
-import { Button } from "react-native-paper";
+import AppbarC from "../../components/AppBarC";
 
 const MAP_API_KEY = Constants.expoConfig.gmaps.apiKey;
 
@@ -69,9 +69,9 @@ const MapScreen = () => {
 
   const handleSubmit = () => {
     // Handle the first button click action here
-    
+
     setShowSubmit(false);
-  }
+  };
 
   const handleOpenInMaps = () => {
     if (coordinates.length > 1 && selectedMarker !== null) {
@@ -89,170 +89,179 @@ const MapScreen = () => {
 
   if (!showSubmit) {
     return (
-      <View style={styles.container}>
-        {/* <Text>{JSON.stringify(selectedMarker)}</Text> */}
-        <MapView
-          style={styles.map}
-          initialRegion={{
-            latitude: coordinates[0] ? coordinates[0].latitude : 6.0367,
-            longitude: coordinates[0] ? coordinates[0].longitude : 80.217,
-            latitudeDelta: 0.0922,
-            longitudeDelta: 0.0421,
-          }}
-          showsUserLocation={true}
-        >
-          {coordinates.length > 0 &&
-            coordinates.map((coord, index) => (
-              <Marker
-                key={index}
-                coordinate={coord}
-                title={`Point ${index + 1}`}
-                onPress={() => handleMarkerPress(index, coord)}
-                //colour of the marker
-                pinColor={
-                  mailItems[index - 1]?.type === "Normal"
-                    ? "green"
-                    : mailItems[index - 1]?.type === "Registered"
-                    ? "blue"
-                    : mailItems[index - 1]?.type === "Parcel"
-                    ? "orange"
-                    : mailItems[index - 1]?.type === "Return"
-                    ? "red"
-                    : "black" // Default color if none of the types match
-                }
-                In
-                th
-              />
-            ))}
-
-          {coordinates.length > 1 && (
-            <MapViewDirections
-              origin={coordinates[0]}
-              waypoints={coordinates.slice(1, -1)} // Exclude the first and last points
-              destination={coordinates[coordinates.length - 1]}
-              apikey={MAP_API_KEY}
-              strokeWidth={3}
-              strokeColor="grey"
-            />
-          )}
-        </MapView>
-
-        {selectedMarker?.receiver_address_id && (
-          <>
-            <View style={styles.markerInfo}>
-              <Text style={{ fontWeight: "bold" }}>
-                {`${selectedMarker.receiver_name.first_name} ${selectedMarker.receiver_name.mid_name} ${selectedMarker.receiver_name.last_name}`}
-              </Text>
-              <Text>
-                {`No: ${addressUtils.formatAddress(
-                  selectedMarker.receiver_address
-                )}`}
-              </Text>
-              <View
-                style={{
-                  flexDirection: "row",
-                  alignItems: "center",
-                  marginTop: 16,
-                }}
-              >
-                <Text style={{ marginRight: 8 }}>Is the mail delivered?</Text>
-                <Switch
-                  value={isMailDelivered}
-                  onValueChange={(value) => setIsMailDelivered(value)}
+      <>
+        <AppbarC title="Map" />
+        <View style={styles.container}>
+          {/* <Text>{JSON.stringify(selectedMarker)}</Text> */}
+          <MapView
+            style={styles.map}
+            initialRegion={{
+              latitude: coordinates[0] ? coordinates[0].latitude : 6.0367,
+              longitude: coordinates[0] ? coordinates[0].longitude : 80.217,
+              latitudeDelta: 0.0922,
+              longitudeDelta: 0.0421,
+            }}
+            showsUserLocation={true}
+          >
+            {coordinates.length > 0 &&
+              coordinates.map((coord, index) => (
+                <Marker
+                  key={index}
+                  coordinate={coord}
+                  title={`Point ${index + 1}`}
+                  onPress={() => handleMarkerPress(index, coord)}
+                  //colour of the marker
+                  pinColor={
+                    mailItems[index - 1]?.type === "Normal"
+                      ? "green"
+                      : mailItems[index - 1]?.type === "Registered"
+                      ? "blue"
+                      : mailItems[index - 1]?.type === "Parcel"
+                      ? "orange"
+                      : mailItems[index - 1]?.type === "Return"
+                      ? "red"
+                      : "black" // Default color if none of the types match
+                  }
+                  In
+                  th
                 />
-              </View>
+              ))}
 
-              <TouchableOpacity
-                onPress={() => handleButton1Click(selectedMarker)}
-                style={styles.button}
-              >
-                <Text>
-                  Mark as {isMailDelivered ? "Delivered" : "Not Delivered"}
+            {coordinates.length > 1 && (
+              <MapViewDirections
+                origin={coordinates[0]}
+                waypoints={coordinates.slice(1, -1)} // Exclude the first and last points
+                destination={coordinates[coordinates.length - 1]}
+                apikey={MAP_API_KEY}
+                strokeWidth={3}
+                strokeColor="grey"
+              />
+            )}
+          </MapView>
+
+          {selectedMarker?.receiver_address_id && (
+            <>
+              <View style={styles.markerInfo}>
+                <Text style={{ fontWeight: "bold" }}>
+                  {`${selectedMarker.receiver_name.first_name} ${selectedMarker.receiver_name.mid_name} ${selectedMarker.receiver_name.last_name}`}
                 </Text>
-              </TouchableOpacity>
+                <Text>
+                  {`No: ${addressUtils.formatAddress(
+                    selectedMarker.receiver_address
+                  )}`}
+                </Text>
+                <View
+                  style={{
+                    flexDirection: "row",
+                    alignItems: "center",
+                    marginTop: 16,
+                  }}
+                >
+                  <Text style={{ marginRight: 8 }}>Is the mail delivered?</Text>
+                  <Switch
+                    value={isMailDelivered}
+                    onValueChange={(value) => setIsMailDelivered(value)}
+                  />
+                </View>
 
+                <TouchableOpacity
+                  onPress={() => handleButton1Click(selectedMarker)}
+                  style={styles.button}
+                >
+                  <Text>
+                    Mark as {isMailDelivered ? "Delivered" : "Not Delivered"}
+                  </Text>
+                </TouchableOpacity>
+
+                <TouchableOpacity
+                  onPress={() => handleOpenInMaps()}
+                  style={styles.openInMapsButton}
+                >
+                  <Text>Open in Google Maps</Text>
+                </TouchableOpacity>
+              </View>
               <TouchableOpacity
-                onPress={() => handleOpenInMaps()}
-                style={styles.openInMapsButton}
-              >
-                <Text>Open in Google Maps</Text>
-              </TouchableOpacity>
-            </View>
-            <TouchableOpacity
-              style={styles.overlay}
-              onPress={() => handleOverlayPress()}
-            />
-          </>
-        )}
-      </View>
+                style={styles.overlay}
+                onPress={() => handleOverlayPress()}
+              />
+            </>
+          )}
+        </View>
+      </>
     );
   } else {
     return (
-      <View style={styles.container}>
-        <View style={styles.container2}>
-          <TouchableOpacity
-            style={styles.button}
-            onPress={() => setShowSubmit(false)}
-          >
-            <Text style={styles.buttonText}>Back</Text>
-          </TouchableOpacity>
-          <TouchableOpacity style={styles.button}>
-            <Text style={styles.buttonText}>Submit</Text>
-          </TouchableOpacity>
-        </View>
-        {isMailDelivered && (
-          <>
-          <SketchCanvas
-            ref={canvasRef}
-            strokeColor={"black"}
-            strokeWidth={5}
-            containerStyle={{
-              flex: 1,
-              orderWidth: 1, // Add border width
-              borderColor: "black",
-              marginRight: 10,
-              marginTop: 10,
-              marginLeft: 10,
-            }}
-          />
+      <>
+        <AppbarC title="Update Status" showBackButton={true} />
+        <View style={styles.container}>
           <View style={styles.container2}>
-          <TouchableOpacity
-            style={styles.button}
-            onPress={() => {canvasRef.current?.reset()}}
-          >
-            <Text style={styles.buttonText}>Clear</Text>
-          </TouchableOpacity>
+            <TouchableOpacity
+              style={styles.button}
+              onPress={() => setShowSubmit(false)}
+            >
+              <Text style={styles.buttonText}>Back</Text>
+            </TouchableOpacity>
+            <TouchableOpacity style={styles.button}>
+              <Text style={styles.buttonText}>Submit</Text>
+            </TouchableOpacity>
+          </View>
+          {isMailDelivered && (
+            <>
+              <SketchCanvas
+                ref={canvasRef}
+                strokeColor={"black"}
+                strokeWidth={5}
+                containerStyle={{
+                  flex: 1,
+                  orderWidth: 1, // Add border width
+                  borderColor: "black",
+                  marginRight: 10,
+                  marginTop: 10,
+                  marginLeft: 10,
+                }}
+              />
+              <View style={styles.container2}>
+                <TouchableOpacity
+                  style={styles.button}
+                  onPress={() => {
+                    canvasRef.current?.reset();
+                  }}
+                >
+                  <Text style={styles.buttonText}>Clear</Text>
+                </TouchableOpacity>
 
-          <TouchableOpacity
-            style={styles.button}
-            onPress={() => {canvasRef.current?.undo()}}
-          >
-            <Text style={styles.buttonText}>Undo</Text>
-          </TouchableOpacity>
+                <TouchableOpacity
+                  style={styles.button}
+                  onPress={() => {
+                    canvasRef.current?.undo();
+                  }}
+                >
+                  <Text style={styles.buttonText}>Undo</Text>
+                </TouchableOpacity>
 
-          <TouchableOpacity
-            style={styles.button}
-            onPress={() => {canvasRef.current?.redo()}}
-          >
-            <Text style={styles.buttonText}>Redo</Text>
-          </TouchableOpacity>
+                <TouchableOpacity
+                  style={styles.button}
+                  onPress={() => {
+                    canvasRef.current?.redo();
+                  }}
+                >
+                  <Text style={styles.buttonText}>Redo</Text>
+                </TouchableOpacity>
+              </View>
+            </>
+          )}
 
+          {!isMailDelivered && (
+            <TextInput
+              placeholder="Enter note here..."
+              multiline
+              value={note}
+              onChangeText={(text) => setNote(text)}
+              style={styles.inputField}
+            />
+          )}
         </View>
-        </>
-        )}
-
-        {!isMailDelivered && (
-          <TextInput
-            placeholder="Enter note here..."
-            multiline
-            value={note}
-            onChangeText={(text) => setNote(text)}
-            style={styles.inputField}
-          />
-        )}
-
-
-      </View>
+      </>
     );
   }
 };

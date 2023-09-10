@@ -19,7 +19,7 @@ function BottomBar(props) {
         borderTopLeftRadius: 20, // Rounded upper left corner
       }}
       // activeColor="blue"          // Color when selected
-      // inactiveColor="gray"        // Color when not selected
+      inactiveColor="white"        // Color when not selected
       onTabPress={({ route, preventDefault }) => {
         const event = navigation.emit({
           type: "tabPress",

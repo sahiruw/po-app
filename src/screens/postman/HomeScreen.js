@@ -1,8 +1,9 @@
 import React, { useEffect, useState } from "react";
 import { View, Button, StyleSheet, Text } from "react-native";
 import { useTheme } from "../../assets/theme/theme";
-import userService from "../../services/userService"
-import routeService from "../../services/routeService"
+import userService from "../../services/userService";
+import routeService from "../../services/routeService";
+import AppBarC from "../../components/AppBarC";
 
 const HomeScreen = ({ navigation }) => {
   var { theme } = useTheme();
@@ -17,13 +18,15 @@ const HomeScreen = ({ navigation }) => {
   }, []);
 
   return (
-    <View style={[styles.container, { backgroundColor: theme.backgroundColor }]}>
-      {/* <Text>HomeScreen of the Postman</Text> */}
-      <ModernDateTimeDisplay />
-    </View>
+    <>
+      <AppBarC title="Home" />
+      <View style={[styles.container]}>
+        {/* <Text>HomeScreen of the Postman</Text> */}
+        <ModernDateTimeDisplay />
+      </View>
+    </>
   );
 };
-
 
 const ModernDateTimeDisplay = () => {
   const [currentDateTime, setCurrentDateTime] = useState(new Date());
@@ -57,17 +60,16 @@ const styles = StyleSheet.create({
   },
 
   clockContainer: {
-    alignItems: 'center',
+    alignItems: "center",
   },
   dateText: {
     fontSize: 24,
-    fontWeight: 'bold',
+    fontWeight: "bold",
     marginBottom: 8,
   },
   timeText: {
     fontSize: 32,
   },
 });
-
 
 export default HomeScreen;

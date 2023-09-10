@@ -7,6 +7,7 @@ import {
   FlatList,
 } from "react-native";
 import { useTheme } from "../../assets/theme/theme";
+import AppbarC from "../../components/AppBarC";
 
 const MailListTabs = () => {
   const mailList = [
@@ -26,58 +27,60 @@ const MailListTabs = () => {
     return mailList.filter((mail) => mail.status === status);
   };
 
-
   let today = new Date();
   return (
-    <View style={styles.container}>
-      <View style={[styles.tabs, { borderColor: theme.primaryColor }]}>
-        <TouchableOpacity
-          style={[
-            styles.tab,
-            selectedTab === "In progress"
-              ? { backgroundColor: theme.primaryColor }
-              : { backgroundColor: "#f0f0f0" },
-          ]}
-          onPress={() => setSelectedTab("In progress")}
-        >
-          <Text>In progress</Text>
-        </TouchableOpacity>
-        <TouchableOpacity
-          style={[
-            styles.tab,
-            selectedTab === "Delivered"
-              ? { backgroundColor: theme.primaryColor }
-              : { backgroundColor: "#f0f0f0" },
-          ]}
-          onPress={() => setSelectedTab("Delivered")}
-        >
-          <Text>Delivered</Text>
-        </TouchableOpacity>
-        <TouchableOpacity
-          style={[
-            styles.tab,
-            selectedTab === "Delivery Failed"
-              ? { backgroundColor: theme.primaryColor }
-              : { backgroundColor: "#f0f0f0" },
-          ]}
-          onPress={() => setSelectedTab("Delivery Failed")}
-        >
-          <Text>Delivery Failed</Text>
-        </TouchableOpacity>
-      </View>
-      <FlatList
-        data={filterMailList(selectedTab)}
-        keyExtractor={(item) => item.id.toString()}
-        renderItem={({ item }) => (
-          <TouchableOpacity >
-            <View style={styles.mailItem}>
-              <Text>{item.name}</Text>
-              <Text>{today.toLocaleString()}</Text>
-            </View>
+    <>
+      <AppbarC title="Mail List" />
+      <View style={styles.container}>
+        <View style={[styles.tabs, { borderColor: theme.primaryColor }]}>
+          <TouchableOpacity
+            style={[
+              styles.tab,
+              selectedTab === "In progress"
+                ? { backgroundColor: theme.primaryColor }
+                : { backgroundColor: "#f0f0f0" },
+            ]}
+            onPress={() => setSelectedTab("In progress")}
+          >
+            <Text>In progress</Text>
           </TouchableOpacity>
-        )}
-      />
-    </View>
+          <TouchableOpacity
+            style={[
+              styles.tab,
+              selectedTab === "Delivered"
+                ? { backgroundColor: theme.primaryColor }
+                : { backgroundColor: "#f0f0f0" },
+            ]}
+            onPress={() => setSelectedTab("Delivered")}
+          >
+            <Text>Delivered</Text>
+          </TouchableOpacity>
+          <TouchableOpacity
+            style={[
+              styles.tab,
+              selectedTab === "Delivery Failed"
+                ? { backgroundColor: theme.primaryColor }
+                : { backgroundColor: "#f0f0f0" },
+            ]}
+            onPress={() => setSelectedTab("Delivery Failed")}
+          >
+            <Text>Delivery Failed</Text>
+          </TouchableOpacity>
+        </View>
+        <FlatList
+          data={filterMailList(selectedTab)}
+          keyExtractor={(item) => item.id.toString()}
+          renderItem={({ item }) => (
+            <TouchableOpacity>
+              <View style={styles.mailItem}>
+                <Text>{item.name}</Text>
+                <Text>{today.toLocaleString()}</Text>
+              </View>
+            </TouchableOpacity>
+          )}
+        />
+      </View>
+    </>
   );
 };
 

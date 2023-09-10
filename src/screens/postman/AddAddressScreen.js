@@ -4,7 +4,7 @@ import MapView, { Marker } from "react-native-maps";
 import { useTheme } from "../../assets/theme/theme";
 
 import addressUtils from "../../utils/addressUtils";
-
+import AppbarC from "../../components/AppBarC";
 
 const AddAddressScreen = () => {
   const [addressLine1, setAddressLine1] = useState("");
@@ -68,6 +68,8 @@ const AddAddressScreen = () => {
   };
 
   return (
+    <>
+    <AppbarC title="Add Address" />
     <View style={styles.container}>
       <TextInput
         style={styles.input}
@@ -108,7 +110,7 @@ const AddAddressScreen = () => {
         <Text>Submit</Text>
       </TouchableOpacity>
 
-    </View>
+    </View></>
   );
 };
 
@@ -116,6 +118,7 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     padding: 20,
+    backgroundColor: "#fff",
   },
   input: {
     width: "100%",
