@@ -1,10 +1,9 @@
 // navigation/RootStack.js
-import React from 'react';
-import { createNativeStackNavigator } from '@react-navigation/native-stack';
+import React from "react";
+import { createNativeStackNavigator } from "@react-navigation/native-stack";
 
-
-import EditProfileScreen from "../screens/EditProfileScreen"
-import LoginScreen from "../screens/LoginScreen"
+import EditProfileScreen from "../screens/EditProfileScreen";
+import LoginScreen from "../screens/LoginScreen";
 
 import HomeScreen from "../screens/dispatcher/HomeScreen";
 import BottomBar from "../screens/BottomBar";
@@ -29,66 +28,68 @@ const RootStack = () => {
   );
 };
 
-
 function MainStack() {
-    var {theme} = useTheme();
-  
-    return (
-      <StackBottom.Navigator
-        defaultScreenOptions={HomeScreen}
-        screenOptions={{
-          headerShown: false,
-          tabBarShowLabel: false,
-          headerStyle: {
-            backgroundColor: theme.primaryColor,
-            elevation: 0,
-            shadowOpacity: 0,
-          }
+  var { theme } = useTheme();
+
+  return (
+    <StackBottom.Navigator
+      defaultScreenOptions={HomeScreen}
+      screenOptions={{
+        headerShown: false,
+        tabBarShowLabel: false,
+        headerStyle: {
+          backgroundColor: theme.primaryColor,
+          elevation: 0,
+          shadowOpacity: 0,
+        },
+      }}
+      tabBar={({ navigation, state, descriptors, insets }) => (
+        <BottomBar navData={{ navigation, state, descriptors, insets }} />
+      )}
+    >
+      <StackBottom.Screen
+        name="Dispatcher Home"
+        component={HomeScreen}
+        options={{
+          tabBarLabel: "Home",
+          tabBarIcon: ({ color, size }) => {
+            return <Icon name="home" size={size} color={color} />;
+          },
         }}
-        tabBar={({ navigation, state, descriptors, insets }) => (
-          <BottomBar
-            navData={{ navigation, state, descriptors, insets }}
-          />
-        )}
-      >
-        <StackBottom.Screen
-          name="Dispatcher Home"
-          component={HomeScreen}
-          options={{
-            tabBarLabel: "Home",
-            tabBarIcon: ({ color, size }) => {
-              return <Icon name="home" size={size} color={color} />;
-            },
-          }}
-        />
-<StackBottom.Screen
-          name="Add"
-          component={AddtoBundleScreen}
-          options={{
-            tabBarLabel: "Settings",
-            tabBarIcon: ({ color, size }) => {
-              return <Icon name="cog" size={size} color={color} />;
-            },
-          }}
-          />
-  
-        <StackBottom.Screen
-          name="Settings"
-          component={SettingsView}
-          options={{
-            tabBarLabel: "Settings",
-            tabBarIcon: ({ color, size }) => {
-              return <Icon name="cog" size={size} color={color} />;
-            },
-          }}
-        />
-  
-  
-      </StackBottom.Navigator>
-      
-    );
-  }
+      />
+      <StackBottom.Screen
+        name="Add"
+        component={AddtoBundleScreen}
+        options={{
+          tabBarLabel: "Add to Bundle",
+          tabBarIcon: ({ color, size }) => {
+            return <Icon name="barcode-scan" size={size} color={color} />;
+          },
+        }}
+      />
 
-
+      <StackBottom.Screen
+        name="View"
+        component={AddtoBundleScreen}
+        options={{
+          tabBarLabel: "Add to Bundle",
+          tabBarIcon: ({ color, size }) => {
+            return <Icon name="view-list" size={size} color={color} />;
+          },
+        }}
+      />
+      <StackBottom.Screen
+        name="Settings"
+        component={SettingsView}
+        options={{
+          tabBarLabel: "Settings",
+          tabBarIcon: ({ color, size }) => {
+            return <Icon name="cog" size={size} color={color} />;
+          },
+        }}
+      />
+    </StackBottom.Navigator>
+  );
+}
 
 export default RootStack;

@@ -1,10 +1,16 @@
 import mailItemData from "../data/mailItemData";
 
-const getDetailsofMailItem = async (mailItemId) => {
-  let mailData = await mailItemData.getDetailsofMailItem(mailItemId);
+const getDetailsofMailItemByID = async (mailItemId) => {
+  let mailData = await mailItemData.getDetailsofMailItemByID(mailItemId);
+  return mailData;
+};
+
+const getDetailsofMailItemByBarcodeID = async (barcodeID) => {
+  let mailData = await mailItemData.getDetailsofMailItemByID(mailItemId);
   return mailData;
 };
 
 export default {
-  getDetailsofMailItem,
+   getDetailsofMailItemByID,
+    getDetailsofMailItemByBarcodeID
 };

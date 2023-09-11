@@ -8,19 +8,12 @@ const AppbarC = ({ title , showBackButton}) => {
   var { theme } = useTheme();
   const navigation = useNavigation();
   return (
-    <Appbar.Header style={{ backgroundColor: theme.lightBackgroundColor3 }}>
+    <Appbar.Header style={{ backgroundColor: theme.lightBackgroundColor3, height:50 }}>
       {showBackButton && <Appbar.BackAction onPress={() => navigation.goBack()} color="white"/>}
-      <Appbar.Content title={title} titleStyle={{ color: "white" }} />
-      {/* <Appbar.Action icon="bell" onPress={() => Handle notifications} /> */}
-      <TouchableOpacity
-        onPress={() => {
-          /* Handle notifications */
-        }}
-      >
-        <Badge>3</Badge>
+      <Appbar.Content title={title} titleStyle={{ color: "white", }} />
+      
+      <Appbar.Action icon="bell" onPress={() => {}} />
 
-        <Avatar.Icon icon="bell" size={24} style={styles.notificationIcon} />
-      </TouchableOpacity>
     </Appbar.Header>
   );
 };

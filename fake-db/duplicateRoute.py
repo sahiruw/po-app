@@ -17,11 +17,14 @@ source_doc_ref = db.collection("Route").document(source_document_id)
 
 # Get the data from the source document
 source_data = source_doc_ref.get().to_dict()
-
+mails = source_data['mails']
+newData = {
+    '9wKkbgqZZPOP6mAioP1ge5zdORe2': mails
+}
 # Create a new document with a different ID
 new_document_ref = db.collection("Route").document("11092023")
 
 # Set the data of the new document with the data from the source document
-new_document_ref.set(source_data)
+new_document_ref.set(newData)
 
 print("Document duplicated successfully")

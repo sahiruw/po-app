@@ -19,10 +19,12 @@ const getRoute = async (dateKey, uid) => {
     const docRef = doc(db, "Route", dateKey);
     const docSnap = await getDoc(docRef);
     if (docSnap.exists()) {
-      routeIDS = docSnap.data();
+      let docSnapData = docSnap.data();
+      let assignedMails = docSnapData[uid];
+      
       if (routeIDS) {
-        for (let mail of routeIDS.mails) {
-          let maildata = await mailItemData.getDetailsofMailItem(mail);
+        for (let mail of assignedMails) {
+          let maildata = await mailItemData.getDetailsofMailItemByID(mail);
           let recipientAddress = await addressData.getDetailsofAddress(
             maildata.receiver_address_id
           );

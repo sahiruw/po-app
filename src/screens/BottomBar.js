@@ -17,6 +17,7 @@ function BottomBar(props) {
       style={{
         backgroundColor: theme.lightBackgroundColor3,
         borderTopLeftRadius: 20, // Rounded upper left corner
+        height: 70,
       }}
       // activeColor="blue"          // Color when selected
       inactiveColor="white"        // Color when not selected

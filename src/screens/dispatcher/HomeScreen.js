@@ -4,6 +4,7 @@ import { useTheme } from "../../assets/theme/theme";
 import userService from "../../services/userService";
 import routeService from "../../services/routeService";
 import AppBarC from "../../components/AppBarC";
+import mailItemService from "../../services/mailItemService";
 
 const HomeScreen = ({ navigation }) => {
   var { theme } = useTheme();
@@ -14,7 +15,12 @@ const HomeScreen = ({ navigation }) => {
       let user = await userService.getUserData();
       setUser(user);
     }
+    async function getMailData() {
+      let mail = await mailItemService.getDetailsofMailItemByID("0Op2tD2zDfe3mfVxf2SF")
+      console.log(mail);
+    }
     getUser();
+    getMailData();
   }, []);
 
   return (
