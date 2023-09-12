@@ -1,12 +1,12 @@
 const lightTheme = {
   // Primary color (Light Maroon)
-  primaryColor: '#FF6B6B', // Light maroon color
+  primaryColor: '#3f3430', // Light maroon color
 
   // Background colors
   backgroundColor: '#FFFFFF', // White background
   lightBackgroundColor: '#FFB0B0', // Light red background
-  lightBackgroundColor2: '#FF8C8C', // Lighter red background
-  lightBackgroundColor3: '#FF6868', // Lightest red background
+  lightBackgroundColor2: '#f2c848', // Lighter red background
+  lightBackgroundColor3: '#3f3430', // Lightest red background
 
   // Accent colors
   accentColor: '#FF4500', // Deep red accent color

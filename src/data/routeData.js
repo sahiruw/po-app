@@ -22,7 +22,7 @@ const getRoute = async (dateKey, uid) => {
       let docSnapData = docSnap.data();
       let assignedMails = docSnapData[uid];
       
-      if (routeIDS) {
+      if (assignedMails) {
         for (let mail of assignedMails) {
           let maildata = await mailItemData.getDetailsofMailItemByID(mail);
           let recipientAddress = await addressData.getDetailsofAddress(

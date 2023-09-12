@@ -42,7 +42,9 @@ const MailListTabs = () => {
             ]}
             onPress={() => setSelectedTab("In progress")}
           >
-            <Text>In progress</Text>
+            <Text style={selectedTab === "In progress"
+                ? {color: theme.backgroundColor}
+                : {}}>In progress</Text>
           </TouchableOpacity>
           <TouchableOpacity
             style={[
@@ -53,7 +55,9 @@ const MailListTabs = () => {
             ]}
             onPress={() => setSelectedTab("Delivered")}
           >
-            <Text>Delivered</Text>
+            <Text style={selectedTab === "Delivered"
+                ? {color: theme.backgroundColor}
+                : {}}>Delivered</Text>
           </TouchableOpacity>
           <TouchableOpacity
             style={[
@@ -64,7 +68,11 @@ const MailListTabs = () => {
             ]}
             onPress={() => setSelectedTab("Delivery Failed")}
           >
-            <Text>Delivery Failed</Text>
+  
+
+            <Text style={selectedTab === "Delivery Failed"
+                ? {color: theme.backgroundColor}
+                : {}}>Delivery Failed</Text>
           </TouchableOpacity>
         </View>
         <FlatList

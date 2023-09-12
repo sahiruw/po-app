@@ -8,9 +8,9 @@ const AppbarC = ({ title , showBackButton}) => {
   var { theme } = useTheme();
   const navigation = useNavigation();
   return (
-    <Appbar.Header style={{ backgroundColor: theme.lightBackgroundColor3, height:50 }}>
+    <Appbar.Header style={{ backgroundColor: theme.lightBackgroundColor2, height:50 }}>
       {showBackButton && <Appbar.BackAction onPress={() => navigation.goBack()} color="white"/>}
-      <Appbar.Content title={title} titleStyle={{ color: "white", }} />
+      <Appbar.Content title={String(title).toUpperCase()} titleStyle={{ color: theme.primaryColor}} />
       
       <Appbar.Action icon="bell" onPress={() => {}} />
 

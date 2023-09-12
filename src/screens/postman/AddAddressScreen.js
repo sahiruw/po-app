@@ -106,8 +106,8 @@ const AddAddressScreen = () => {
       >
         {selectedLocation && <Marker coordinate={selectedLocation} draggable />}
       </MapView>
-      <TouchableOpacity style={[styles.button ,{ backgroundColor: theme.primaryColor}]} onPress={handleSubmit}>
-        <Text>Submit</Text>
+      <TouchableOpacity style={[styles.button ,{ backgroundColor: theme.lightBackgroundColor2}]} onPress={handleSubmit}>
+        <Text >Submit</Text>
       </TouchableOpacity>
 
     </View></>

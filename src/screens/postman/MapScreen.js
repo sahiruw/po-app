@@ -7,6 +7,7 @@ import {
   Linking,
   Switch,
   TextInput,
+  Button,
 } from "react-native";
 import MapView, { Marker } from "react-native-maps";
 import MapViewDirections from "react-native-maps-directions";
@@ -50,7 +51,6 @@ const MapScreen = () => {
         });
       }
       setCoordinates(coordinatesTemp);
-
     };
     fetchCoordinates();
     console.log("Coordinates fetched from API");
@@ -80,9 +80,15 @@ const MapScreen = () => {
   };
 
   const handleOpenInMaps = () => {
-    if (coordinates.length > 1 && selectedMarker !== null) {
-      const { latitude, longitude } = selectedMarker;
-      const url = `https://www.google.com/maps/dir/?api=1&destination=${latitude},${longitude}`;
+    console.log("Opening in Google Maps");
+    console.log(coordinates)
+    if (coordinates.length > 1) {
+      //from last coordinate
+      const {latitude, longitude} = coordinates[coordinates.length - 1];
+
+      const url = `https://www.google.com/maps/dir/?api=1&destination=${latitude},${longitude}&travelmode = driving&waypoints=${coordinates.slice(1, -2)
+        .map((coordinate) => `${coordinate.latitude},${coordinate.longitude}`)
+        .join("|")}`;
       console.log("Opening in Google Maps:", url);
       Linking.openURL(url);
     }
@@ -104,8 +110,14 @@ const MapScreen = () => {
         {isLoading && <LoadingScreen />}
 
         <View style={styles.container}>
-          {/* <Text>{JSON.stringify(selectedMarker)}</Text> */}
-         
+          {/* <Text>{JSON.stringify(coordinates)}</Text> */}
+          <TouchableOpacity
+            onPress={handleOpenInMaps}
+            style={styles.openInMapsButton}
+          >
+            <Text>Open in Google Maps</Text>
+          </TouchableOpacity>
+
           <MapView
             style={styles.map}
             initialRegion={{
@@ -152,8 +164,6 @@ const MapScreen = () => {
             )}
           </MapView>
 
-          
-          
           {selectedMarker?.receiver_address_id && (
             <>
               <View style={styles.markerInfo}>
@@ -186,13 +196,6 @@ const MapScreen = () => {
                   <Text>
                     Mark as {isMailDelivered ? "Delivered" : "Not Delivered"}
                   </Text>
-                </TouchableOpacity>
-
-                <TouchableOpacity
-                  onPress={() => handleOpenInMaps()}
-                  style={styles.openInMapsButton}
-                >
-                  <Text>Open in Google Maps</Text>
                 </TouchableOpacity>
               </View>
               <TouchableOpacity

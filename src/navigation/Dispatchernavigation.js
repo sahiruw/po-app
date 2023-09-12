@@ -9,7 +9,7 @@ import HomeScreen from "../screens/dispatcher/HomeScreen";
 import BottomBar from "../screens/BottomBar";
 import SettingsView from "../screens/SettingsView";
 import AddtoBundleScreen from "../screens/dispatcher/AddtoBundleScreen";
-
+// import create
 import { createBottomTabNavigator } from "@react-navigation/bottom-tabs";
 
 import Icon from "react-native-vector-icons/MaterialCommunityIcons";
@@ -69,12 +69,12 @@ function MainStack() {
       />
 
       <StackBottom.Screen
-        name="View"
+        name="View Bundles"
         component={AddtoBundleScreen}
         options={{
-          tabBarLabel: "Add to Bundle",
+          tabBarLabel: "View Bundles",
           tabBarIcon: ({ color, size }) => {
-            return <Icon name="view-list" size={size} color={color} />;
+            return <Icon name="package-variant-closed" size={size} color={color} />;
           },
         }}
       />
