@@ -11,19 +11,21 @@ const getBundleData = async () => {
     where("date", "==", date)
   );
 
+    let bundles = []
   // Fetch the documents that match the query
-  getDocs(q)
+  await getDocs(q)
     .then((querySnapshot) => {
       querySnapshot.forEach((doc) => {
-        console.log("Document data:", doc.data());
-        return doc.data();
+        // console.log(doc.id, " => ", doc.data());
+        bundles.push({id: doc.id, ...doc.data()})
       });
     })
     .catch((error) => {
       console.error("Error fetching documents:", error);
-      return null;
     });
+    return bundles;
 };
+
 
 export default {
   getBundleData,

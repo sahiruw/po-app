@@ -13,11 +13,9 @@ import DispatcherStack from "./Dispatchernavigation";
 import AuthStack from "./LoginNavigator";
 
 import userService from "../services/userService";
-import AuthProvider, {AuthContext} from "../contextStore/AuthProvider";
-
+import AuthProvider, { AuthContext } from "../contextStore/AuthProvider";
 
 function RootNavigator() {
-
   const { user, setUser } = useContext(AuthContext);
   const [loading, setLoading] = useState(true);
 
@@ -28,16 +26,18 @@ function RootNavigator() {
       if (authenticatedUser) {
         console.log("User is authenticated");
         const uid = authenticatedUser.uid;
-        let userData = await userService.getUserData(uid, authenticatedUser.email);
+        let userData = await userService.getUserData(
+          uid,
+          authenticatedUser.email
+        );
         // console.log("User Data", userData);
         setUser(userData);
       } else {
-        
         console.log("User is not authenticated");
         setUser(null);
-        setLoading(false)
+        setLoading(false);
 
-        return <AuthStack />
+        return <AuthStack />;
       }
 
       setLoading(false);
@@ -45,26 +45,11 @@ function RootNavigator() {
     return () => unsubscribe();
   }, []);
 
-  // useEffect(() => {
-  //   //get user from async
-  //   setLoading(true);
-  //   const getUser = async () => {
-  //     let user = await userService.getUserData();
-  //     // console.log("User from async", user);
-  //     if (user !== null) {
-  //       setUser(user);
-  //     }
-  //   };
-  //   getUser();
-  //   setLoading(false);
-  // }, []);
-
-
   if (loading) {
     return <LoadingScreen />;
   }
   let userRole = user?.role;
-  console.log(userRole)
+  // console.log(userRole)
   return (
     <NavigationContainer>
       {userRole === "postman" ? (
@@ -87,4 +72,3 @@ const AppNavigator = () => {
 };
 
 export default AppNavigator;
-

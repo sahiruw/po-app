@@ -15,10 +15,13 @@ import { BarCodeScanner } from "expo-barcode-scanner";
 import DropDownPicker from "react-native-dropdown-picker";
 import AppbarC from "../../components/AppBarC";
 import FontAwesome5 from "react-native-vector-icons/FontAwesome5";
+import bundleService from "../../services/bundleService";
+import LoadingScreen from "../LoadingScreen";
+import postOfficeService from "../../services/postOfficeService";
 
 export default function App() {
   const [hasPermission, setHasPermission] = useState(null);
-
+  const [isLoading, setIsLoading] = useState(true);
   const [scannedBarcode, setScannedBarcode] = useState(true);
   const [barcodeList, setBarcodeList] = useState([
     "654",
@@ -32,13 +35,47 @@ export default function App() {
 
   const [selectedBundleId, setSelectedBundleId] = useState(null);
   const [open, setOpen] = useState(false);
-  const [bundleIds, setBundleIds] = useState([
-    { label: "Bundle ID 1", value: "Bundle ID 1" },
-    { label: "Bundle ID 2", value: "Bundle ID 2" },
-    { label: "Bundle ID 3", value: "Bundle ID 3" },
-  ]);
+  const [bundleIds, setBundleIds] = useState([{ label: "", value: "1" }]);
+  const [bundles, setBundles] = useState([]);
+  const [mailsOfSelectedBundle, setMailsOfSelectedBundle] = useState([]);
 
-  //   const bundleIds = ["Bundle ID 1", "Bundle ID 2", "Bundle ID 3"];
+  const getBundles = async () => {
+    setIsLoading(true);
+    let bundles = await bundleService.getBundleData();
+    setBundles(bundles);
+    let bundleIds = [];
+
+    for (let bundle of bundles) {
+      let poData = await postOfficeService.getDetailsofPostofficeByID(
+        bundle.destination_post_office_id
+      );
+      bundleIds.push({
+        label: `${poData?.name} - ${bundle.destination_post_office_id}`,
+        value: bundle.id,
+      });
+    }
+    setBundleIds(bundleIds);
+
+    console.log("Bundles for today", bundles);
+    setIsLoading(false);
+  };
+
+  useEffect(() => {
+    getBundles();
+  }, []);
+
+  useEffect(() => {
+    if (selectedBundleId) {
+      let mailsOfSelectedBundle = bundles.find(
+        (item) => item.id === selectedBundleId
+      ).mail_service_items;
+      setMailsOfSelectedBundle(
+        mailsOfSelectedBundle.map((item) => {
+          return { id: item, scanned: false };
+        })
+      );
+    }
+  }, [selectedBundleId]);
 
   useEffect(() => {
     const getBarCodeScannerPermissions = async () => {
@@ -52,37 +89,14 @@ export default function App() {
   const handleBarCodeScanned = ({ type, data }) => {
     setScannedBarcode(true);
 
-    if (!barcodeList.includes(data)) {
-      setBarcodeList([...barcodeList.reverse(), data].reverse());
-      alert(`Bar code with type ${type} and data ${data} has been scanned!`);
-    } else {
-      alert(`Barcode ${data} already exists in the list`);
+    for (let mail of mailsOfSelectedBundle) {
+      if (mail.id === data) {
+        mail.scanned = true;
+        break;
+      }
     }
-  };
 
-  const handleRemoveBarcode = (barcode) => {
-    // Show a confirmation prompt to the user
-    Alert.alert(
-      "Confirm Removal",
-      "Are you sure you want to remove this barcode?",
-      [
-        {
-          text: "Cancel",
-          onPress: () => {},
-          style: "cancel",
-        },
-        {
-          text: "Remove",
-          onPress: () => {
-            // User confirmed, remove the barcode
-            setBarcodeList(barcodeList.filter((item) => item !== barcode));
-            console.log(`Removed barcode: ${barcode}`);
-          },
-          style: "destructive",
-        },
-      ],
-      { cancelable: false }
-    );
+    setMailsOfSelectedBundle(mailsOfSelectedBundle);
   };
 
   if (hasPermission === null) {
@@ -103,7 +117,7 @@ export default function App() {
         ></Button>
         <View style={{ padding: 10 }}>
           <BarCodeScanner
-            barCodeTypes={[BarCodeScanner.Constants.BarCodeType.upc_e]}
+            barCodeTypes={[BarCodeScanner.Constants.BarCodeType.code128]}
             onBarCodeScanned={scannedBarcode ? undefined : handleBarCodeScanned}
             style={[
               StyleSheet.absoluteFillObject,
@@ -117,7 +131,9 @@ export default function App() {
 
   return (
     <>
+      {isLoading && <LoadingScreen />}
       <AppbarC title="Add to Bundle" />
+      {/* <Text>{JSON.stringify(mailsOfSelectedBundle)}</Text> */}
       <View style={styles.container}>
         <Text>Select a Bundle ID:</Text>
         <DropDownPicker
@@ -140,20 +156,32 @@ export default function App() {
                 title={"Scan to add MailItem"}
                 onPress={() => setScannedBarcode(false)}
               />
-              <Button title={"Clear List"} onPress={() => setBarcodeList([])} />
+              {/* <Button title={"Clear List"} onPress={() => setBarcodeList([])} /> */}
             </View>
 
             <View style={{ flex: 1 }}>
               <FlatList
-                data={barcodeList}
+                data={mailsOfSelectedBundle.map((item) => {
+                  return item.id;
+                })}
                 keyExtractor={(item, index) => index.toString()}
                 renderItem={({ item }) => (
                   <View style={styles.containerRow}>
                     <Text>{item}</Text>
-
-                    <TouchableOpacity onPress={() => handleRemoveBarcode(item)}>
-                      <FontAwesome5 name={"trash-alt"} brand />
-                    </TouchableOpacity>
+                    {mailsOfSelectedBundle.find((mail) => mail.id === item)
+                      ?.scanned ? (
+                      <FontAwesome5
+                        name={"check"}
+                        style={{ color: "#00b815" }}
+                        brand
+                      />
+                    ) : (
+                      <FontAwesome5
+                        name={"times"}
+                        style={{ color: "#ff0000" }}
+                        brand
+                      />
+                    )}
                   </View>
                 )}
                 style={{

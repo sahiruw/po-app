@@ -5,6 +5,7 @@ import userService from "../../services/userService";
 import routeService from "../../services/routeService";
 import AppBarC from "../../components/AppBarC";
 import mailItemService from "../../services/mailItemService";
+import { BarCodeScanner } from "expo-barcode-scanner";
 
 const HomeScreen = ({ navigation }) => {
   var { theme } = useTheme();
@@ -20,15 +21,25 @@ const HomeScreen = ({ navigation }) => {
       console.log(mail);
     }
     getUser();
-    getMailData();
+    // getMailData();
   }, []);
 
   return (
     <>
-      <AppBarC title="Home" />
-      <View style={[styles.container]}>
-        <Text>HomeScreen of the Dispatcher</Text>
-        <ModernDateTimeDisplay />
+      <AppBarC title="Scan Bundle" />
+      <View style={{ padding: 10 }}>
+        <Text>Scan the barcode on the bundle.</Text>
+
+        <View style={{ padding: 10 }}>
+          <BarCodeScanner
+            barCodeTypes={[BarCodeScanner.Constants.BarCodeType.code128]}
+            onBarCodeScanned={undefined}
+            style={[
+              StyleSheet.absoluteFillObject,
+              { height: 450, padding: 5, margin: 25,  },
+            ]}
+          />
+        </View>
       </View>
     </>
   );
