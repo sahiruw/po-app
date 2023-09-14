@@ -30,8 +30,8 @@ const SettingsView = () => {
   const handleLogout = async () => {
     try {
       await signOut(auth);
-      // await AsyncStorage.removeItem("user");
-      await userService.removeUserData();
+      await AsyncStorage.removeItem("user");
+      // await userService.removeUserData();
       setTimeout(() => {
         console.log("Waited 1 second");
       }, 1000);

@@ -16,24 +16,27 @@ import Constants from "expo-constants";
 import routeService from "../../services/routeService";
 import addressUtils from "../../utils/addressUtils";
 
-import { SketchCanvas, SketchCanvasRef } from "rn-perfect-sketch-canvas";
 import AppbarC from "../../components/AppBarC";
 import LoadingScreen from "../LoadingScreen";
+import { useNavigation } from "@react-navigation/core";
+
+import { MailListContext } from "../../contextStore/MailListProvider";
+import { useContext } from "react";
 
 const MAP_API_KEY = Constants.expoConfig.gmaps.apiKey;
 
 const MapScreen = () => {
   const [selectedMarker, setSelectedMarker] = useState(null);
   const [coordinates, setCoordinates] = useState([]);
-  const [mailItems, setMailItems] = useState([]);
+  const {mailList, setMailList} = useContext(MailListContext)
 
   const [isMailDelivered, setIsMailDelivered] = useState(false);
   const [showSubmit, setShowSubmit] = useState(false);
-  const [note, setNote] = useState("");
+
 
   const [isLoading, setIsLoading] = useState(false);
+  const navigation = useNavigation();
 
-  const canvasRef = useRef();
 
 
   useEffect(() => {
@@ -41,7 +44,7 @@ const MapScreen = () => {
     // Fetch the coordinates from the API
     const fetchCoordinates = async () => {
       let route = await routeService.getRouteForToday();
-      setMailItems(route.mailItemData);
+      setMailList(route.mailItemData);
       let userloc = await addressUtils.getUserLocation();
       let coordinatesTemp = [userloc];
       for (let mail of route.mailItemData) {
@@ -59,25 +62,21 @@ const MapScreen = () => {
   }, [coordinates.length]);
 
   const handleMarkerPress = (index, coord) => {
-    setSelectedMarker({ index, ...mailItems[index - 1] });
+    setSelectedMarker({ index, ...mailList[index - 1] });
     setIsMailDelivered(false);
-    canvasRef.current?.reset();
-    setNote("");
   };
 
   const handleButton1Click = (marker) => {
     // Handle the first button click action here
-    console.log("Button 1 clicked for marker:", marker);
-    if (marker.type != "Normal") {
-      setShowSubmit(true);
-    }
+
+    // console.log("Button 1 clicked for marker:", marker);
+
+    if (marker.type != "Normal" || !isMailDelivered) {
+      navigation.navigate("DeliverySubmission", { isMailDelivered, marker});
+    } 
   };
 
-  const handleSubmit = () => {
-    // Handle the first button click action here
 
-    setShowSubmit(false);
-  };
 
   const handleOpenInMaps = () => {
     console.log("Opening in Google Maps");
@@ -103,8 +102,6 @@ const MapScreen = () => {
   // if (isLoading) {
   //   return <LoadingScreen />;
   // }
-
-  if (!showSubmit) {
     return (
       <>
         <AppbarC title="Map" />
@@ -138,13 +135,13 @@ const MapScreen = () => {
                   onPress={() => handleMarkerPress(index, coord)}
                   //colour of the marker
                   pinColor={
-                    mailItems[index - 1]?.type === "Normal"
+                    mailList[index - 1]?.type === "Normal"
                       ? "green"
-                      : mailItems[index - 1]?.type === "Registered"
+                      : mailList[index - 1]?.type === "Registered"
                       ? "blue"
-                      : mailItems[index - 1]?.type === "Parcel"
+                      : mailList[index - 1]?.type === "Parcel"
                       ? "orange"
-                      : mailItems[index - 1]?.type === "Return"
+                      : mailList[index - 1]?.type === "Return"
                       ? "red"
                       : "black" // Default color if none of the types match
                   }
@@ -206,81 +203,7 @@ const MapScreen = () => {
         </View>
       </>
     );
-  } else {
-    return (
-      <>
-        <AppbarC title="Update Status" showBackButton={true} />
-        <View style={styles.container}>
-          <View style={styles.container2}>
-            <TouchableOpacity
-              style={styles.button}
-              onPress={() => setShowSubmit(false)}
-            >
-              <Text style={styles.buttonText}>Back</Text>
-            </TouchableOpacity>
-            <TouchableOpacity style={styles.button}>
-              <Text style={styles.buttonText}>Submit</Text>
-            </TouchableOpacity>
-          </View>
-          {isMailDelivered && (
-            <>
-              <SketchCanvas
-                ref={canvasRef}
-                strokeColor={"black"}
-                strokeWidth={5}
-                containerStyle={{
-                  flex: 1,
-                  borderWidth: 1, // Add border width
-                  borderColor: "black",
-                  marginRight: 10,
-                  marginTop: 10,
-                  marginLeft: 10,
-                }}
-              />
-              <View style={styles.container2}>
-                <TouchableOpacity
-                  style={styles.button}
-                  onPress={() => {
-                    canvasRef.current?.reset();
-                  }}
-                >
-                  <Text style={styles.buttonText}>Clear</Text>
-                </TouchableOpacity>
-
-                <TouchableOpacity
-                  style={styles.button}
-                  onPress={() => {
-                    canvasRef.current?.undo();
-                  }}
-                >
-                  <Text style={styles.buttonText}>Undo</Text>
-                </TouchableOpacity>
-
-                <TouchableOpacity
-                  style={styles.button}
-                  onPress={() => {
-                    canvasRef.current?.redo();
-                  }}
-                >
-                  <Text style={styles.buttonText}>Redo</Text>
-                </TouchableOpacity>
-              </View>
-            </>
-          )}
-
-          {!isMailDelivered && (
-            <TextInput
-              placeholder="Enter note here..."
-              multiline
-              value={note}
-              onChangeText={(text) => setNote(text)}
-              style={styles.inputField}
-            />
-          )}
-        </View>
-      </>
-    );
-  }
+  
 };
 
 const styles = StyleSheet.create({

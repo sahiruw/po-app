@@ -10,7 +10,7 @@ const getRoute = async (dateKey, uid) => {
   let routeStored = JSON.parse(routeRaw);
 
   if (routeStored?.dateKey === dateKey) {
-    console.log("route from  async", routeStored);
+    console.log("route from  async");
     return routeStored;
   } else {
     console.log("reading route from firebase");
@@ -29,6 +29,7 @@ const getRoute = async (dateKey, uid) => {
             maildata.receiver_address_id
           );
           maildata.receiver_address = recipientAddress;
+          maildata['id'] = mail;
           if (maildata) {
             mailsForToday.push(maildata);
           }
@@ -43,6 +44,7 @@ const getRoute = async (dateKey, uid) => {
     }
     console.log("No route document!");
     return { dateKey, uid, mailItemData: mailsForToday };
+    console.log("Route imported")
   }
 };
 

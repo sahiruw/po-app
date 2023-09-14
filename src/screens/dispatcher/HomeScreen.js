@@ -5,12 +5,14 @@ import userService from "../../services/userService";
 import routeService from "../../services/routeService";
 import AppBarC from "../../components/AppBarC";
 import mailItemService from "../../services/mailItemService";
+import bundleService from "../../services/bundleService";
 
 const HomeScreen = ({ navigation }) => {
   var { theme } = useTheme();
   const [user, setUser] = useState(null);
 
   useEffect(() => {
+    bundleService.getBundleData();
     async function getUser() {
       let user = await userService.getUserData();
       setUser(user);

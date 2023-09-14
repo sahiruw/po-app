@@ -35,6 +35,9 @@ function RootNavigator() {
         
         console.log("User is not authenticated");
         setUser(null);
+        setLoading(false)
+
+        return <AuthStack />
       }
 
       setLoading(false);
@@ -61,6 +64,7 @@ function RootNavigator() {
     return <LoadingScreen />;
   }
   let userRole = user?.role;
+  console.log(userRole)
   return (
     <NavigationContainer>
       {userRole === "postman" ? (
