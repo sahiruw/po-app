@@ -35,6 +35,7 @@ const MapScreen = () => {
 
   const canvasRef = useRef();
 
+
   useEffect(() => {
     setIsLoading(true);
     // Fetch the coordinates from the API
@@ -67,10 +68,9 @@ const MapScreen = () => {
   const handleButton1Click = (marker) => {
     // Handle the first button click action here
     console.log("Button 1 clicked for marker:", marker);
-    setShowSubmit(true);
-    setCoordinates(
-      coordinates.filter((coord, index) => index !== marker.index)
-    );
+    if (marker.type != "Normal") {
+      setShowSubmit(true);
+    }
   };
 
   const handleSubmit = () => {
@@ -81,12 +81,13 @@ const MapScreen = () => {
 
   const handleOpenInMaps = () => {
     console.log("Opening in Google Maps");
-    console.log(coordinates)
+    console.log(coordinates);
     if (coordinates.length > 1) {
       //from last coordinate
-      const {latitude, longitude} = coordinates[coordinates.length - 1];
+      const { latitude, longitude } = coordinates[coordinates.length - 1];
 
-      const url = `https://www.google.com/maps/dir/?api=1&destination=${latitude},${longitude}&travelmode = driving&waypoints=${coordinates.slice(1, -2)
+      const url = `https://www.google.com/maps/dir/?api=1&destination=${latitude},${longitude}&travelmode = driving&waypoints=${coordinates
+        .slice(1, -2)
         .map((coordinate) => `${coordinate.latitude},${coordinate.longitude}`)
         .join("|")}`;
       console.log("Opening in Google Maps:", url);
@@ -147,8 +148,6 @@ const MapScreen = () => {
                       ? "red"
                       : "black" // Default color if none of the types match
                   }
-                  In
-                  th
                 />
               ))}
 
@@ -194,7 +193,7 @@ const MapScreen = () => {
                   style={styles.button}
                 >
                   <Text>
-                    Mark as {isMailDelivered ? "Delivered" : "Not Delivered"}
+                    {isMailDelivered ? selectedMarker.type != "Normal" ? "Get Signature" : "Mark as Delivered" : "Add Delivery Failure Notice"}
                   </Text>
                 </TouchableOpacity>
               </View>
@@ -231,7 +230,7 @@ const MapScreen = () => {
                 strokeWidth={5}
                 containerStyle={{
                   flex: 1,
-                  orderWidth: 1, // Add border width
+                  borderWidth: 1, // Add border width
                   borderColor: "black",
                   marginRight: 10,
                   marginTop: 10,

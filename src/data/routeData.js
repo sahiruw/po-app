@@ -10,7 +10,7 @@ const getRoute = async (dateKey, uid) => {
   let routeStored = JSON.parse(routeRaw);
 
   if (routeStored?.dateKey === dateKey) {
-    console.log("route from  async");
+    console.log("route from  async", routeStored);
     return routeStored;
   } else {
     console.log("reading route from firebase");

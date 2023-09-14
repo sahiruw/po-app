@@ -1,5 +1,5 @@
 // screens/SettingsScreen.js
-import React, { useEffect, useState } from "react";
+import React, { useContext, useEffect, useState } from "react";
 import { View, Text, TouchableOpacity, StyleSheet } from "react-native";
 import { Avatar } from "react-native-paper";
 import AppBarC from "../components/AppBarC";
@@ -14,27 +14,16 @@ import { useNavigation } from "@react-navigation/core";
 import userService from "../services/userService";
 import userUtils from "../utils/userUtils";
 
+import {AuthContext} from "../contextStore/AuthProvider";
+
 const SettingsView = () => {
   var { theme } = useTheme();
-  const [user, setUser] = useState(null);
+  const {user, setUser} = useContext(AuthContext);
 
-  clearAsyncStorage = async() => {
+
+  clearAsyncStorage = async () => {
     AsyncStorage.removeItem("route");
-}
-
-  useEffect(() => {
-    const getUserData = async () => {
-      try {
-        const jsonValue = await AsyncStorage.getItem("user");
-        if (jsonValue != null) {
-          setUser(JSON.parse(jsonValue));
-        }
-      } catch (e) {
-        console.log(e);
-      }
-    };
-    getUserData();
-  }, []);
+  };
 
   const navigation = useNavigation();
 
@@ -60,21 +49,24 @@ const SettingsView = () => {
       {/* User Info Section */}
       {/* Replace with actual user data */}
       <View style={styles.userInfo}>
-        <Avatar.Image source={require("./profile.jpg")} size={100} />
+        <Avatar.Image source={{ uri: user?.profile_picture }} size={100} />
         <Text>Name: {userUtils.formatName(user?.name)}</Text>
         <Text>Email: {user?.email}</Text>
         <Text>Role: {user?.role}</Text>
       </View>
+      {/* <Text>{JSON.stringify(user)}</Text> */}
       <TouchableOpacity
         style={styles.actionItem}
-        onPress={() => navigation.navigate("EditProfile")}
+        onPress={() => {
+          navigation.navigate("EditProfile");
+        }}
       >
         <Text>Edit Profile Data</Text>
       </TouchableOpacity>
       <TouchableOpacity style={styles.actionItem}>
         <Text>Show Statistics</Text>
       </TouchableOpacity>
-      <TouchableOpacity style={styles.actionItem} onPress={clearAsyncStorage }>
+      <TouchableOpacity style={styles.actionItem} onPress={clearAsyncStorage}>
         <Text>Clear Cache</Text>
       </TouchableOpacity>
       <TouchableOpacity style={styles.actionItem} onPress={handleLogout}>

@@ -42,6 +42,8 @@
     "react-native-vector-icons": "^10.0.0",
     "react-native-web": "^0.19.8",
     "react-navigation-header-buttons": "^11.0.0",
+    "react-redux": "^8.1.2",
+    "redux": "^4.2.1",
     "rn-perfect-sketch-canvas": "^0.3.0"
   },
   "devDependencies": {
