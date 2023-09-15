@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import { View, Button, StyleSheet, Text } from "react-native";
+import { View, Button, StyleSheet, Text, Alert } from "react-native";
 import { useTheme } from "../../assets/theme/theme";
 import userService from "../../services/userService";
 import routeService from "../../services/routeService";
@@ -10,6 +10,7 @@ import { BarCodeScanner } from "expo-barcode-scanner";
 const HomeScreen = ({ navigation }) => {
   var { theme } = useTheme();
   const [user, setUser] = useState(null);
+  const [scannedBarcode, setScannedBarcode] = useState(false);
 
   useEffect(() => {
     async function getUser() {
@@ -17,29 +18,46 @@ const HomeScreen = ({ navigation }) => {
       setUser(user);
     }
     async function getMailData() {
-      let mail = await mailItemService.getDetailsofMailItemByID("0Op2tD2zDfe3mfVxf2SF")
+      let mail = await mailItemService.getDetailsofMailItemByID(
+        "0Op2tD2zDfe3mfVxf2SF"
+      );
       console.log(mail);
     }
     getUser();
     // getMailData();
   }, []);
 
+  const handleBarCodeScanned = ({ type, data }) => {
+    setScannedBarcode(true);
+    console.log(`Bar code with type ${type} and data ${data} has been scanned!`);
+    Alert.alert(
+      "Scan successful!",
+      `The package ${data} has been marked as arrived!`
+    );
+  };
+
   return (
     <>
       <AppBarC title="Scan Bundle" />
       <View style={{ padding: 10 }}>
-        <Text>Scan the barcode on the bundle.</Text>
-
-        <View style={{ padding: 10 }}>
-          <BarCodeScanner
-            barCodeTypes={[BarCodeScanner.Constants.BarCodeType.code128]}
-            onBarCodeScanned={undefined}
-            style={[
-              StyleSheet.absoluteFillObject,
-              { height: 450, padding: 5, margin: 25,  },
-            ]}
-          />
-        </View>
+        <Button title={"Scan"} onPress={() => {setScannedBarcode(false)}} />
+        {!scannedBarcode && (
+          <>
+            <Text>Scan the barcode on the bundle.</Text>
+            <View style={{ padding: 10 }}>
+              <BarCodeScanner
+                barCodeTypes={[BarCodeScanner.Constants.BarCodeType.code128]}
+                onBarCodeScanned={
+                  scannedBarcode ? undefined : handleBarCodeScanned
+                }
+                style={[
+                  StyleSheet.absoluteFillObject,
+                  { height: 450, padding: 5, margin: 25 },
+                ]}
+              />
+            </View>
+          </>
+        )}
       </View>
     </>
   );

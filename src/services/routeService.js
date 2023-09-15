@@ -5,7 +5,7 @@ import dateUtils from "../utils/dateUtils";
 
 const getRouteDataForToday = async () => {
 
-  let dateKey = dateUtils.setToday();
+  let dateKey = dateUtils.getToday();
 
   const user = await userService.getUserData();
 

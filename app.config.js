@@ -6,10 +6,10 @@ export default {
     slug: "po-app2",
     version: "1.0.0",
     orientation: "portrait",
-    icon: "./src/assets/icon.png",
+    icon: "./src/assets/logo.png",
     userInterfaceStyle: "light",
     splash: {
-      image: "./src/assets/splash.png",
+      image: "./src/assets/logo.png",
       resizeMode: "contain",
       backgroundColor: "#ffffff",
     },
@@ -19,12 +19,12 @@ export default {
     },
     android: {
       adaptiveIcon: {
-        foregroundImage: "./src/assets/adaptive-icon.png",
+        foregroundImage: "./src/assets/app-logo.png",
         backgroundColor: "#ffffff",
       },
     },
     web: {
-      favicon: "./src/assets/favicon.png",
+      favicon: "./src/assets/app-logo.png",
     },
     extra: {
       apiKey: process.env.API_KEY,

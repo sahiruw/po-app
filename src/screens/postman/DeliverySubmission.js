@@ -129,7 +129,7 @@ const DeliverySubmission = ({ route, navigation }) => {
             styles.button,
             { backgroundColor: theme.lightBackgroundColor2, top: 20 },
           ]}
-          onPress={() => {}}
+          onPress={() => {navigation.goBack();}}
         >
           <Text style={styles.buttonText}>Cancel</Text>
         </TouchableOpacity>

@@ -18,26 +18,20 @@ import FontAwesome5 from "react-native-vector-icons/FontAwesome5";
 import bundleService from "../../services/bundleService";
 import LoadingScreen from "../LoadingScreen";
 import postOfficeService from "../../services/postOfficeService";
+import mailItemService from "../../services/mailItemService";
+import userUtils from "../../utils/userUtils";
 
 export default function App() {
   const [hasPermission, setHasPermission] = useState(null);
   const [isLoading, setIsLoading] = useState(true);
   const [scannedBarcode, setScannedBarcode] = useState(true);
-  const [barcodeList, setBarcodeList] = useState([
-    "654",
-    "654655",
-    "864531",
-    "654654",
-    "654654",
-    "665431",
-    "687949874651",
-  ]);
 
   const [selectedBundleId, setSelectedBundleId] = useState(null);
   const [open, setOpen] = useState(false);
   const [bundleIds, setBundleIds] = useState([{ label: "", value: "1" }]);
   const [bundles, setBundles] = useState([]);
   const [mailsOfSelectedBundle, setMailsOfSelectedBundle] = useState([]);
+  const [selectedMailItem, setSelectedMailItem] = useState(null);
 
   const getBundles = async () => {
     setIsLoading(true);
@@ -89,14 +83,32 @@ export default function App() {
   const handleBarCodeScanned = ({ type, data }) => {
     setScannedBarcode(true);
 
-    for (let mail of mailsOfSelectedBundle) {
+    for (let mailIdx in mailsOfSelectedBundle) {
+      let mail = mailsOfSelectedBundle[mailIdx];
       if (mail.id === data) {
         mail.scanned = true;
+        mailsOfSelectedBundle.splice(mailIdx, 1); // Remove the item from its current position
+        mailsOfSelectedBundle.push(mail);
         break;
       }
     }
 
     setMailsOfSelectedBundle(mailsOfSelectedBundle);
+  };
+
+  const handleMailItemClick = (item) => {
+    setIsLoading(true);
+    const getMailData = async (id) => {
+      let mail = await mailItemService.getDetailsofMailItemByID(id);
+      console.log(mail);
+      setSelectedMailItem(mail);
+    };
+    getMailData(String(item).trim());
+    setIsLoading(false);
+  };
+
+  const handleOverlayPress = () => {
+    setSelectedMailItem(null);
   };
 
   if (hasPermission === null) {
@@ -166,23 +178,28 @@ export default function App() {
                 })}
                 keyExtractor={(item, index) => index.toString()}
                 renderItem={({ item }) => (
-                  <View style={styles.containerRow}>
-                    <Text>{item}</Text>
-                    {mailsOfSelectedBundle.find((mail) => mail.id === item)
-                      ?.scanned ? (
-                      <FontAwesome5
-                        name={"check"}
-                        style={{ color: "#00b815" }}
-                        brand
-                      />
-                    ) : (
-                      <FontAwesome5
-                        name={"times"}
-                        style={{ color: "#ff0000" }}
-                        brand
-                      />
-                    )}
-                  </View>
+                  <TouchableOpacity
+                    style={{ flex: 1 }}
+                    onPress={() => handleMailItemClick(item)}
+                  >
+                    <View style={styles.containerRow}>
+                      <Text>{item}</Text>
+                      {mailsOfSelectedBundle.find((mail) => mail.id === item)
+                        ?.scanned ? (
+                        <FontAwesome5
+                          name={"check"}
+                          style={{ color: "#00b815" }}
+                          brand
+                        />
+                      ) : (
+                        <FontAwesome5
+                          name={"times"}
+                          style={{ color: "#ff0000" }}
+                          brand
+                        />
+                      )}
+                    </View>
+                  </TouchableOpacity>
                 )}
                 style={{
                   borderWidth: 1,
@@ -204,6 +221,23 @@ export default function App() {
               <Text>Submit</Text>
             </TouchableOpacity>
           </View>
+        )}
+
+        {selectedMailItem && (
+          <>
+            <View style={styles.markerInfo}>
+              <Text style={{ fontSize: 20, fontWeight: "bold" }}>
+                Mail Type: {selectedMailItem.type}
+              </Text>
+              <Text style={{ fontSize: 20, fontWeight: "bold" }}>
+                Receiver: {userUtils.formatName(selectedMailItem.receiver_name)}
+              </Text>
+            </View>
+            <TouchableOpacity
+              style={styles.overlay}
+              onPress={() => handleOverlayPress()}
+            />
+          </>
         )}
       </View>
     </>
@@ -227,5 +261,26 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     padding: 25,
+  },
+  markerInfo: {
+    position: "absolute",
+    bottom: 20,
+    left: 20,
+    right: 20,
+    backgroundColor: "white",
+    padding: 10,
+    borderRadius: 5,
+    flexDirection: "column",
+    alignItems: "center",
+    zIndex: 1, // Ensure the popup is above the overlay
+  },
+  overlay: {
+    position: "absolute",
+    top: 0,
+    bottom: 0,
+    left: 0,
+    right: 0,
+    backgroundColor: "transparent",
+    zIndex: 0, // Place the overlay behind the popup
   },
 });

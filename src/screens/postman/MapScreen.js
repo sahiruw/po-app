@@ -74,6 +74,7 @@ const MapScreen = () => {
     if (marker.type != "Normal" || !isMailDelivered) {
       navigation.navigate("DeliverySubmission", { isMailDelivered, marker});
     } 
+    setSelectedMarker(null);
   };
 
 
@@ -119,8 +120,8 @@ const MapScreen = () => {
           <MapView
             style={styles.map}
             initialRegion={{
-              latitude: coordinates[0] ? coordinates[0].latitude : 6.0367,
-              longitude: coordinates[0] ? coordinates[0].longitude : 80.217,
+              latitude: coordinates[0] ? coordinates[0].latitude : 6.79,
+              longitude: coordinates[0] ? coordinates[0].longitude : 79.90,
               latitudeDelta: 0.0922,
               longitudeDelta: 0.0421,
             }}
