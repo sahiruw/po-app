@@ -12,6 +12,8 @@ import {
 import MapView, { Marker } from "react-native-maps";
 import MapViewDirections from "react-native-maps-directions";
 
+import FontAwesome5 from "react-native-vector-icons/FontAwesome5";
+
 import Constants from "expo-constants";
 import routeService from "../../services/routeService";
 import addressUtils from "../../utils/addressUtils";
@@ -28,16 +30,12 @@ const MAP_API_KEY = Constants.expoConfig.gmaps.apiKey;
 const MapScreen = () => {
   const [selectedMarker, setSelectedMarker] = useState(null);
   const [coordinates, setCoordinates] = useState([]);
-  const {mailList, setMailList} = useContext(MailListContext)
+  const { mailList, setMailList } = useContext(MailListContext);
 
   const [isMailDelivered, setIsMailDelivered] = useState(false);
-  const [showSubmit, setShowSubmit] = useState(false);
-
 
   const [isLoading, setIsLoading] = useState(false);
   const navigation = useNavigation();
-
-
 
   useEffect(() => {
     setIsLoading(true);
@@ -72,12 +70,10 @@ const MapScreen = () => {
     // console.log("Button 1 clicked for marker:", marker);
 
     if (marker.type != "Normal" || !isMailDelivered) {
-      navigation.navigate("DeliverySubmission", { isMailDelivered, marker});
-    } 
+      navigation.navigate("DeliverySubmission", { isMailDelivered, marker });
+    }
     setSelectedMarker(null);
   };
-
-
 
   const handleOpenInMaps = () => {
     console.log("Opening in Google Maps");
@@ -103,108 +99,120 @@ const MapScreen = () => {
   // if (isLoading) {
   //   return <LoadingScreen />;
   // }
-    return (
-      <>
-        <AppbarC title="Map" />
-        {isLoading && <LoadingScreen />}
+  return (
+    <>
+      <AppbarC title="Map" />
+      {isLoading && <LoadingScreen />}
 
-        <View style={styles.container}>
-          {/* <Text>{JSON.stringify(coordinates)}</Text> */}
-          <TouchableOpacity
-            onPress={handleOpenInMaps}
-            style={styles.openInMapsButton}
-          >
-            <Text>Open in Google Maps</Text>
-          </TouchableOpacity>
+      <View style={styles.container}>
+        {/* <Text>{JSON.stringify(coordinates)}</Text> */}
+        <TouchableOpacity
+          onPress={handleOpenInMaps}
+          style={styles.openInMapsButton}
+        >
+          <Text>Open in Google Maps</Text>
+        </TouchableOpacity>
 
-          <MapView
-            style={styles.map}
-            initialRegion={{
-              latitude: coordinates[0] ? coordinates[0].latitude : 6.79,
-              longitude: coordinates[0] ? coordinates[0].longitude : 79.90,
-              latitudeDelta: 0.0922,
-              longitudeDelta: 0.0421,
-            }}
-            showsUserLocation={true}
-          >
-            {coordinates.length > 0 &&
-              coordinates.map((coord, index) => (
-                <Marker
-                  key={index}
-                  coordinate={coord}
-                  title={`Point ${index + 1}`}
-                  onPress={() => handleMarkerPress(index, coord)}
-                  //colour of the marker
-                  pinColor={
-                    mailList[index - 1]?.type === "Normal"
-                      ? "green"
-                      : mailList[index - 1]?.type === "Registered"
-                      ? "blue"
-                      : mailList[index - 1]?.type === "Parcel"
-                      ? "orange"
-                      : mailList[index - 1]?.type === "Return"
-                      ? "red"
-                      : "black" // Default color if none of the types match
-                  }
-                />
-              ))}
-
-            {coordinates.length > 1 && (
-              <MapViewDirections
-                origin={coordinates[0]}
-                waypoints={coordinates.slice(1, -1)} // Exclude the first and last points
-                destination={coordinates[coordinates.length - 1]}
-                apikey={MAP_API_KEY}
-                strokeWidth={3}
-                strokeColor="grey"
+        <MapView
+          style={styles.map}
+          initialRegion={{
+            latitude: coordinates[0] ? coordinates[0].latitude : 6.79,
+            longitude: coordinates[0] ? coordinates[0].longitude : 79.9,
+            latitudeDelta: 0.0922,
+            longitudeDelta: 0.0421,
+          }}
+          showsUserLocation={true}
+        >
+          {coordinates.length > 0 &&
+            coordinates.slice(1).map((coord, index) => (
+              <Marker
+                key={index}
+                coordinate={coord}
+                title={`Point ${index + 1}`}
+                onPress={() => handleMarkerPress(index, coord)}
+                //colour of the marker
+                pinColor={
+                  mailList[index - 1]?.type === "Normal"
+                    ? "green"
+                    : mailList[index - 1]?.type === "Registered"
+                    ? "blue"
+                    : mailList[index - 1]?.type === "Parcel"
+                    ? "orange"
+                    : mailList[index - 1]?.type === "Return"
+                    ? "red"
+                    : "black" // Default color if none of the types match
+                }
               />
-            )}
-          </MapView>
+            ))}
 
-          {selectedMarker?.receiver_address_id && (
-            <>
-              <View style={styles.markerInfo}>
-                <Text style={{ fontWeight: "bold" }}>
-                  {`${selectedMarker.receiver_name.first_name} ${selectedMarker.receiver_name.mid_name} ${selectedMarker.receiver_name.last_name}`}
-                </Text>
-                <Text>
-                  {`No: ${addressUtils.formatAddress(
-                    selectedMarker.receiver_address
-                  )}`}
-                </Text>
-                <View
-                  style={{
-                    flexDirection: "row",
-                    alignItems: "center",
-                    marginTop: 16,
-                  }}
-                >
-                  <Text style={{ marginRight: 8 }}>Is the mail delivered?</Text>
-                  <Switch
-                    value={isMailDelivered}
-                    onValueChange={(value) => setIsMailDelivered(value)}
-                  />
-                </View>
-
-                <TouchableOpacity
-                  onPress={() => handleButton1Click(selectedMarker)}
-                  style={styles.button}
-                >
-                  <Text>
-                    {isMailDelivered ? selectedMarker.type != "Normal" ? "Get Signature" : "Mark as Delivered" : "Add Delivery Failure Notice"}
-                  </Text>
-                </TouchableOpacity>
-              </View>
-              <TouchableOpacity
-                style={styles.overlay}
-                onPress={() => handleOverlayPress()}
-              />
-            </>
+          {coordinates.length > 1 && (
+            <MapViewDirections
+              origin={coordinates[0]}
+              waypoints={coordinates.slice(1, -1)} // Exclude the first and last points
+              destination={coordinates[coordinates.length - 1]}
+              apikey={MAP_API_KEY}
+              strokeWidth={3}
+              strokeColor="grey"
+            />
           )}
-        </View>
-      </>
-    );
-  
+        </MapView>
+
+        {selectedMarker?.receiver_address_id && (
+          <>
+            <View style={styles.markerInfo}>
+              <Text style={{ fontWeight: "bold" }}>
+                <FontAwesome5
+                  name={"envelope"}
+                  style={{ color: "#00b815", right:18 }}
+                  brand
+                />
+                {selectedMarker.type}
+              </Text>
+
+              <Text style={{ fontWeight: "bold" }}>
+                {`${selectedMarker.receiver_name.first_name} ${selectedMarker.receiver_name.mid_name} ${selectedMarker.receiver_name.last_name}`}
+              </Text>
+              <Text>
+                {`No: ${addressUtils.formatAddress(
+                  selectedMarker.receiver_address
+                )}`}
+              </Text>
+              <View
+                style={{
+                  flexDirection: "row",
+                  alignItems: "center",
+                  marginTop: 16,
+                }}
+              >
+                <Text style={{ marginRight: 8 }}>Is the mail delivered?</Text>
+                <Switch
+                  value={isMailDelivered}
+                  onValueChange={(value) => setIsMailDelivered(value)}
+                />
+              </View>
+
+              <TouchableOpacity
+                onPress={() => handleButton1Click(selectedMarker)}
+                style={styles.button}
+              >
+                <Text>
+                  {isMailDelivered
+                    ? selectedMarker.type != "Normal"
+                      ? "Get Signature"
+                      : "Mark as Delivered"
+                    : "Add Delivery Failure Notice"}
+                </Text>
+              </TouchableOpacity>
+            </View>
+            <TouchableOpacity
+              style={styles.overlay}
+              onPress={() => handleOverlayPress()}
+            />
+          </>
+        )}
+      </View>
+    </>
+  );
 };
 
 const styles = StyleSheet.create({

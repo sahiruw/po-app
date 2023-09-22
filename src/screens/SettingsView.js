@@ -63,7 +63,9 @@ const SettingsView = () => {
       >
         <Text>Edit Profile Data</Text>
       </TouchableOpacity>
-      <TouchableOpacity style={styles.actionItem}>
+      <TouchableOpacity style={styles.actionItem} onPress={() => {
+          navigation.navigate("Statistics");
+        }}>
         <Text>Show Statistics</Text>
       </TouchableOpacity>
       <TouchableOpacity style={styles.actionItem} onPress={clearAsyncStorage}>

@@ -4,7 +4,7 @@ const lightTheme = {
 
   // Background colors
   backgroundColor: '#FFFFFF', // White background
-  lightBackgroundColor: '#FFB0B0', // Light red background
+  lightBackgroundColor: '#fbfbd4', // Light red background
   lightBackgroundColor2: '#f2c848', // Lighter red background
   lightBackgroundColor3: '#3f3430', // Lightest red background
 

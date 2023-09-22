@@ -1,5 +1,5 @@
 import { auth, db } from "../config/firebase";
-import { doc, getDoc } from "firebase/firestore";
+import { addDoc, collection, doc, getDoc } from "firebase/firestore";
 
 const getDetailsofAddress = async (addressId) => {
     const docRef = doc(db, "Address", addressId);
@@ -12,7 +12,16 @@ const getDetailsofAddress = async (addressId) => {
     return null;
     }
 
+const addAddress = async (address) => {
+    const addressCollectionRef = collection(db, "Address");
+    const docRef = await addDoc(addressCollectionRef, address);
+    
+
+    return docRef.id;
+};
+
 export default {
     getDetailsofAddress,
+    addAddress,
 };
 

@@ -11,6 +11,7 @@ import {
   Alert,
 } from "react-native";
 import { BarCodeScanner } from "expo-barcode-scanner";
+import { ALERT_TYPE, Dialog, Toast } from "react-native-alert-notification";
 
 import DropDownPicker from "react-native-dropdown-picker";
 import AppbarC from "../../components/AppBarC";
@@ -19,9 +20,15 @@ import bundleService from "../../services/bundleService";
 import LoadingScreen from "../LoadingScreen";
 import postOfficeService from "../../services/postOfficeService";
 import mailItemService from "../../services/mailItemService";
-import userUtils from "../../utils/userUtils";
+
+import {Icons} from "../../assets/icons";
+import Icon from "react-native-vector-icons/MaterialCommunityIcons";
+
+import { useTheme } from "../../assets/theme/theme";
 
 export default function App() {
+  var { theme } = useTheme();
+
   const [hasPermission, setHasPermission] = useState(null);
   const [isLoading, setIsLoading] = useState(true);
   const [scannedBarcode, setScannedBarcode] = useState(true);
@@ -44,7 +51,7 @@ export default function App() {
         bundle.destination_post_office_id
       );
       bundleIds.push({
-        label: `${poData?.name} - ${bundle.destination_post_office_id}`,
+        label: `${poData?.Name} - ${bundle.destination_post_office_id}`,
         value: bundle.id,
       });
     }
@@ -96,6 +103,42 @@ export default function App() {
     setMailsOfSelectedBundle(mailsOfSelectedBundle);
   };
 
+  const handleSubmit = async () => {
+    if (mailsOfSelectedBundle.some((item) => item.scanned === false)) {
+      Toast.show({
+        type: ALERT_TYPE.DANGER,
+        title: "Error",
+        textBody: "Please scan all mail items before submitting",
+        button: "close",
+      });
+      return;
+    }
+    setIsLoading(true);
+    await bundleService.dispatchBundle(
+      selectedBundleId,
+      mailsOfSelectedBundle,
+    );
+    await getBundles();
+    setSelectedBundleId(null);
+    setIsLoading(false);
+  };
+
+  const handleReset = () => {
+    Dialog.show({
+      type: ALERT_TYPE.WARNING,
+      title: "Warning",
+      textBody:
+        "This will reset all scanned mail items. Do you want to continue?",
+      button: "Okay",
+      onPressButton: () => {
+        setMailsOfSelectedBundle(
+          mailsOfSelectedBundle.map((item) => ({ ...item, scanned: false }))
+        );
+        Dialog.hide();
+      },
+    });
+  };
+
   const handleMailItemClick = (item) => {
     setIsLoading(true);
     const getMailData = async (id) => {
@@ -120,24 +163,50 @@ export default function App() {
 
   if (!scannedBarcode) {
     return (
-      <View style={{ padding: 10 }}>
-        <Text>Align the camer to the barcode and wait for it to scan</Text>
-        <Button
-          title={"Cancel"}
-          onPress={() => setScannedBarcode(true)}
-          style={{ top: 10 }}
-        ></Button>
+      <>
+        <AppbarC title="Add to Bundle" />
         <View style={{ padding: 10 }}>
-          <BarCodeScanner
-            barCodeTypes={[BarCodeScanner.Constants.BarCodeType.code128]}
-            onBarCodeScanned={scannedBarcode ? undefined : handleBarCodeScanned}
+          <Text
+            style={{
+              fontSize: 16,
+              marginBottom: 8,
+              textAlign: "center",
+              fontStyle: "italic",
+              fontFamily: "sans-serif-light",
+              padding: 20,
+            }}
+          >
+            Align the camera to the barcode and wait for it to scan
+          </Text>
+
+          <View style={{ height: 420 }}>
+            <BarCodeScanner
+              barCodeTypes={[BarCodeScanner.Constants.BarCodeType.code128]}
+              onBarCodeScanned={
+                scannedBarcode ? undefined : handleBarCodeScanned
+              }
+              style={[
+                StyleSheet.absoluteFillObject,
+                { height: 400, padding: 5 },
+              ]}
+            />
+          </View>
+
+          <TouchableOpacity
             style={[
-              StyleSheet.absoluteFillObject,
-              { height: 450, padding: 5, margin: 25 },
+              styles.button,
+              {
+                backgroundColor: theme.accentColor,
+                width: 250,
+                alignSelf: "center",
+              },
             ]}
-          />
+            onPress={() => setScannedBarcode(true)}
+          >
+            <Text style={styles.buttonText}>Cancel</Text>
+          </TouchableOpacity>
         </View>
-      </View>
+      </>
     );
   }
 
@@ -146,6 +215,7 @@ export default function App() {
       {isLoading && <LoadingScreen />}
       <AppbarC title="Add to Bundle" />
       {/* <Text>{JSON.stringify(mailsOfSelectedBundle)}</Text> */}
+
       <View style={styles.container}>
         <Text>Select a Bundle ID:</Text>
         <DropDownPicker
@@ -164,11 +234,25 @@ export default function App() {
         {selectedBundleId && (
           <View style={{ top: 10, flex: 1 }}>
             <View style={styles.buttonRow}>
-              <Button
-                title={"Scan to add MailItem"}
+              <TouchableOpacity
+                style={[
+                  styles.button,
+                  { backgroundColor: theme.lightBackgroundColor2, width: 200 },
+                ]}
                 onPress={() => setScannedBarcode(false)}
-              />
-              {/* <Button title={"Clear List"} onPress={() => setBarcodeList([])} /> */}
+              >
+                <Text style={styles.buttonText}>Scan</Text>
+              </TouchableOpacity>
+
+              <TouchableOpacity
+                style={[
+                  styles.button,
+                  { backgroundColor: theme.lightBackgroundColor2 },
+                ]}
+                onPress={handleReset}
+              >
+                <Text style={styles.buttonText}>Reset</Text>
+              </TouchableOpacity>
             </View>
 
             <View style={{ flex: 1 }}>
@@ -210,28 +294,28 @@ export default function App() {
               />
             </View>
             <TouchableOpacity
-              onPress={() => handleRemoveBarcode(item)}
-              style={{
-                marginTop: 10,
-                backgroundColor: "lightblue",
-                padding: 10,
-                borderRadius: 5,
-              }}
+              style={[
+                styles.button,
+                { backgroundColor: theme.lightBackgroundColor2 },
+              ]}
+              onPress={handleSubmit}
             >
-              <Text>Submit</Text>
+              <Text style={styles.buttonText}>Submit</Text>
             </TouchableOpacity>
           </View>
         )}
 
         {selectedMailItem && (
           <>
-            <View style={styles.markerInfo}>
+            <View style={[styles.mailInfo, {bottom:100, backgroundColor: theme.lightBackgroundColor, height:200}]}>
               <Text style={{ fontSize: 20, fontWeight: "bold" }}>
                 Mail Type: {selectedMailItem.type}
               </Text>
-              <Text style={{ fontSize: 20, fontWeight: "bold" }}>
-                Receiver: {userUtils.formatName(selectedMailItem.receiver_name)}
+              <Text style={{ fontSize: 20 }}>
+                Receiver: {selectedMailItem.receiver_name}
               </Text>
+
+              <Icon name= {Icons.MailItems[selectedMailItem.type]} size={100} style={{top:20}}/>
             </View>
             <TouchableOpacity
               style={styles.overlay}
@@ -245,6 +329,18 @@ export default function App() {
 }
 
 const styles = StyleSheet.create({
+  button: {
+    marginTop: 10,
+    backgroundColor: "lightblue",
+    padding: 10,
+    borderRadius: 5,
+    // width: 250,
+    alignItems: "center",
+  },
+  buttonText: {
+    color: "white",
+    fontWeight: "bold",
+  },
   buttonRow: {
     flexDirection: "row",
     alignItems: "center",
@@ -262,7 +358,7 @@ const styles = StyleSheet.create({
     flex: 1,
     padding: 25,
   },
-  markerInfo: {
+  mailInfo: {
     position: "absolute",
     bottom: 20,
     left: 20,

@@ -1,49 +1,142 @@
 import React, { useEffect, useState } from "react";
-import { View, Button, StyleSheet, Text, Alert } from "react-native";
+import {
+  View,
+  Button,
+  StyleSheet,
+  Text,
+  Alert,
+  TouchableOpacity,
+} from "react-native";
+import { ALERT_TYPE, Dialog, Toast } from "react-native-alert-notification";
+
 import { useTheme } from "../../assets/theme/theme";
 import userService from "../../services/userService";
-import routeService from "../../services/routeService";
+
 import AppBarC from "../../components/AppBarC";
 import mailItemService from "../../services/mailItemService";
 import { BarCodeScanner } from "expo-barcode-scanner";
+import bundleService from "../../services/bundleService";
+import postOfficeService from "../../services/postOfficeService";
+import LoadingScreen from "../../screens/LoadingScreen";
 
-const HomeScreen = ({ navigation }) => {
+const ScanArrived = ({ navigation }) => {
   var { theme } = useTheme();
   const [user, setUser] = useState(null);
-  const [scannedBarcode, setScannedBarcode] = useState(false);
+  const [scannedBarcode, setScannedBarcode] = useState(true);
+  const [scannedValue, setScannedValue] = useState(null);
+  const [loading, setLoading] = useState(false);
 
   useEffect(() => {
-    async function getUser() {
-      let user = await userService.getUserData();
+    const retrieveUser = async () => {
+      let user = await userService.getActiveUserData();
       setUser(user);
-    }
-    async function getMailData() {
-      let mail = await mailItemService.getDetailsofMailItemByID(
-        "0Op2tD2zDfe3mfVxf2SF"
-      );
-      console.log(mail);
-    }
-    getUser();
-    // getMailData();
+    };
+    retrieveUser();
   }, []);
 
-  const handleBarCodeScanned = ({ type, data }) => {
+  const handleBarCodeScanned = async ({ type, data }) => {
     setScannedBarcode(true);
-    console.log(`Bar code with type ${type} and data ${data} has been scanned!`);
-    Alert.alert(
-      "Scan successful!",
-      `The package ${data} has been marked as arrived!`
-    );
+
+    const retrieveBundle = async () => {
+      setLoading(true);
+      let bundleData = await bundleService.getBundleDataByID(data);
+      console.log(bundleData.destination_post_office_id == user.postoffice)
+      let isValidBundle =
+        bundleData.destination_post_office_id == user.postoffice;
+
+      if (isValidBundle) {
+        let fromPO = await postOfficeService.getDetailsofPostofficeByID(
+          bundleData.origin_post_office_id
+        );
+        let toPO = await postOfficeService.getDetailsofPostofficeByID(
+          bundleData.destination_post_office_id
+        );
+        bundleData = { fromPO, toPO, ...bundleData, bundleID: data };
+
+        setScannedValue(bundleData);
+      }
+      setLoading(false);
+      return isValidBundle;
+    };
+
+    let isValidBundle = await retrieveBundle();
+    if (!isValidBundle) {
+      Dialog.show({
+        type: ALERT_TYPE.DANGER,
+        title: "Invalid Bundle",
+        textBody: `The bundle ${data} is not valid for this post office.`,
+        button: "Okay",
+      });
+    }
+    else {
+      Toast.show({
+        type: ALERT_TYPE.SUCCESS,
+        title: "Successfull",
+        textBody: `The bundle ${data} has been scanned.`,
+        button: "Okay",
+      });
+    }
+  };
+
+  const handleSubmit = async () => {
+    setLoading(true);
+    let bundleData = scannedValue;
+
+    // setScannedValue(null);
+    await bundleService.acceptBundle(bundleData);
+    Dialog.show({
+      type: ALERT_TYPE.SUCCESS,
+      title: "Successfull",
+      textBody: `The bundle ${bundleData.bundleID} has been marked as arrived.`,
+      button: "Okay",
+    });
+    setLoading(false);
   };
 
   return (
     <>
       <AppBarC title="Scan Bundle" />
+      {loading && <LoadingScreen />}
       <View style={{ padding: 10 }}>
-        <Button title={"Scan"} onPress={() => {setScannedBarcode(false)}} />
-        {!scannedBarcode && (
+        {scannedBarcode ? (
+          <TouchableOpacity
+            style={[
+              styles.button,
+              { backgroundColor: theme.lightBackgroundColor3 },
+            ]}
+            onPress={() => {
+              setScannedBarcode(false);
+            }}
+          >
+            <Text style={styles.buttonText}>Scan a bundle</Text>
+          </TouchableOpacity>
+        ) : (
+          <TouchableOpacity
+            style={[
+              styles.button,
+              { backgroundColor: theme.lightBackgroundColor3 },
+            ]}
+            onPress={() => {
+              setScannedBarcode(true);
+            }}
+          >
+            <Text style={styles.buttonText}>Cancel</Text>
+          </TouchableOpacity>
+        )}
+        {!scannedBarcode ? (
           <>
-            <Text>Scan the barcode on the bundle.</Text>
+            <Text
+              style={{
+                fontSize: 16,
+                // marginBottom: 8,
+                textAlign: "center",
+                fontStyle: "italic",
+                fontFamily: "sans-serif-light",
+                padding: 20,
+              }}
+            >
+              Scan the barcode on the bundle.
+            </Text>
             <View style={{ padding: 10 }}>
               <BarCodeScanner
                 barCodeTypes={[BarCodeScanner.Constants.BarCodeType.code128]}
@@ -52,42 +145,98 @@ const HomeScreen = ({ navigation }) => {
                 }
                 style={[
                   StyleSheet.absoluteFillObject,
-                  { height: 450, padding: 5, margin: 25 },
+                  { height: 450, padding: 5, margin: 5 },
                 ]}
               />
             </View>
           </>
-        )}
+        ) : scannedValue ? (
+          <View
+            style={{
+              backgroundColor: theme.lightBackgroundColor2,
+              top: 45,
+              paddingBottom: 20,
+            }}
+          >
+            <Text
+              style={{
+                fontSize: 16,
+                marginBottom: 8,
+                textAlign: "center",
+                fontStyle: "italic",
+                fontWeight: "bold",
+                padding: 20,
+              }}
+            >
+              You have scanned the bundle {scannedValue.bundleID}
+            </Text>
+
+            <Text
+              style={{
+                fontSize: 16,
+                marginBottom: 8,
+                // textAlign: "center",
+                fontStyle: "italic",
+                fontWeight: "bold",
+                fontFamily: "sans-serif-light",
+                padding: 20,
+              }}
+            >
+              From: {scannedValue.fromPO.Name}
+              {"\n"}
+              To: {scannedValue.toPO.Name}
+              {"\n\n"}
+              No of MailItems: {scannedValue.mail_service_items.length}
+            </Text>
+            <TouchableOpacity
+              style={[
+                styles.button,
+                {
+                  backgroundColor: theme.lightBackgroundColor3,
+                  width: 200,
+                  alignSelf: "center",
+                },
+              ]}
+              onPress={handleSubmit}
+            >
+              <Text style={styles.buttonText}>Mark as arrived</Text>
+            </TouchableOpacity>
+            <TouchableOpacity
+              style={[
+                styles.button,
+                {
+                  backgroundColor: theme.lightBackgroundColor3,
+                  width: 200,
+                  alignSelf: "center",
+                },
+              ]}
+              onPress={() => {
+                setScannedValue(null);
+              }}
+            >
+              <Text style={styles.buttonText}>Cancel</Text>
+            </TouchableOpacity>
+            {/* <Text>{JSON.stringify(scannedValue)}</Text> */}
+          </View>
+        ) : null}
       </View>
     </>
   );
 };
 
-const ModernDateTimeDisplay = () => {
-  const [currentDateTime, setCurrentDateTime] = useState(new Date());
-
-  useEffect(() => {
-    // Update the current date and time every second
-    const intervalId = setInterval(() => {
-      setCurrentDateTime(new Date());
-    }, 1000);
-
-    // Clear the interval when the component unmounts
-    return () => clearInterval(intervalId);
-  }, []);
-
-  const formattedDate = currentDateTime.toLocaleDateString();
-  const formattedTime = currentDateTime.toLocaleTimeString();
-
-  return (
-    <View style={styles.clockContainer}>
-      <Text style={styles.dateText}>{formattedDate}</Text>
-      <Text style={styles.timeText}>{formattedTime}</Text>
-    </View>
-  );
-};
-
 const styles = StyleSheet.create({
+  button: {
+    marginTop: 10,
+    backgroundColor: "lightblue",
+    padding: 10,
+    borderRadius: 5,
+    // width: 250,
+    alignItems: "center",
+  },
+  buttonText: {
+    color: "white",
+    fontWeight: "bold",
+  },
   container: {
     flex: 1,
     justifyContent: "center",
@@ -107,4 +256,4 @@ const styles = StyleSheet.create({
   },
 });
 
-export default HomeScreen;
+export default ScanArrived;

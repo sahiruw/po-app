@@ -14,6 +14,7 @@ import AuthStack from "./LoginNavigator";
 
 import userService from "../services/userService";
 import AuthProvider, { AuthContext } from "../contextStore/AuthProvider";
+import { AlertNotificationRoot } from "react-native-alert-notification";
 
 function RootNavigator() {
   const { user, setUser } = useContext(AuthContext);
@@ -65,9 +66,11 @@ function RootNavigator() {
 
 const AppNavigator = () => {
   return (
-    <AuthProvider>
-      <RootNavigator />
-    </AuthProvider>
+    <AlertNotificationRoot>
+      <AuthProvider>
+        <RootNavigator />
+      </AuthProvider>
+    </AlertNotificationRoot>
   );
 };
 

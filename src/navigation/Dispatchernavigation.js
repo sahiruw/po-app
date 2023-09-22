@@ -12,7 +12,7 @@ import AddtoBundleScreen from "../screens/dispatcher/AddtoBundleScreen";
 // import create
 import { createBottomTabNavigator } from "@react-navigation/bottom-tabs";
 import ScanArrivedBundle from "../screens/dispatcher/ScanArrivedBundle";
-
+import StatisticsScreen from "../screens/StatisticsScreen";
 import Icon from "react-native-vector-icons/MaterialCommunityIcons";
 import { useTheme } from "../assets/theme/theme";
 
@@ -25,6 +25,7 @@ const RootStack = () => {
       <Stack.Screen name="Main" component={MainStack} />
       <Stack.Screen name="EditProfile" component={EditProfileScreen} />
       <Stack.Screen name="Login" component={LoginScreen} />
+      <Stack.Screen name="Statistics" component={StatisticsScreen} />
     </Stack.Navigator>
   );
 };

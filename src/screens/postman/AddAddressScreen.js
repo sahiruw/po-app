@@ -1,15 +1,24 @@
 import React, { useState, useEffect } from "react";
-import { View, Text, TextInput, Button, StyleSheet, TouchableOpacity } from "react-native";
+import {
+  View,
+  Text,
+  TextInput,
+  Button,
+  StyleSheet,
+  TouchableOpacity,
+} from "react-native";
 import MapView, { Marker } from "react-native-maps";
 import { useTheme } from "../../assets/theme/theme";
+import { ALERT_TYPE, Dialog, Toast } from "react-native-alert-notification";
 
 import addressUtils from "../../utils/addressUtils";
 import AppbarC from "../../components/AppBarC";
+import userService from "../../services/userService";
+import postOfficeService from "../../services/postOfficeService";
+import addressService from "../../services/addressService";
 
 const AddAddressScreen = () => {
-  const [addressLine1, setAddressLine1] = useState("");
-  const [addressLine2, setAddressLine2] = useState("");
-  const [city, setCity] = useState("");
+  const [address, setAddress] = useState(null);
   const [selectedLocation, setSelectedLocation] = useState(userLocation);
   const [userLocation, setUserLocation] = useState(null);
   var { theme } = useTheme();
@@ -23,13 +32,25 @@ const AddAddressScreen = () => {
     })();
   }, []);
 
+  useEffect(() => {
+    // Get users city from the selected location
+    const getCity = async () => {
+      let dispatcherActive = await userService.getActiveUserData();
+      let po = await postOfficeService.getDetailsofPostofficeByID(
+        dispatcherActive.postoffice
+      );
+
+      setAddress({ ...address, City: po.Name, RegionID: dispatcherActive.postoffice });
+    };
+    getCity();
+  }, []);
+
   const handleMarkerDragEnd = (event) => {
     setSelectedLocation({
       latitude: event.nativeEvent.coordinate.latitude,
       longitude: event.nativeEvent.coordinate.longitude,
     });
   };
-
 
   const handleMapPress = (event) => {
     setSelectedLocation({
@@ -41,80 +62,129 @@ const AddAddressScreen = () => {
   const handleSubmit = async () => {
     // Check if a location is selected
     if (!selectedLocation) {
-      console.log("Please select a location on the map.");
+      Dialog.show({
+        type: ALERT_TYPE.WARNING,
+        title: "Invalid Location",
+        textBody: "Please select a location on the map.",
+        button: "Okay",
+      });
+      return;
+    }
+    if (
+      address.HouseNo == "" ||
+      address.Address_line_1 == "" ||
+      address.Address_line_2 == ""
+    ) {
+      Dialog.show({
+        type: ALERT_TYPE.WARNING,
+        title: "Invalid Address",
+        textBody: `Please fill all the fields.`,
+        button: "Okay",
+      });
       return;
     }
 
     // Save the address  and location to the database
-    // await addDoc(collection(db, "addresses"), {
-    //   addressLine1,
-    //   addressLine2,
-    //   city,
-    //   location: selectedLocation,
-    // });
-    console.log(JSON.stringify( {
-      addressLine1,
-      addressLine2,
-      city,
-      location: selectedLocation,
-    }))
-    // Clear input fields and selected location
-    setAddressLine1("");
-    setAddressLine2("");
-    setCity("");
-    // setSelectedLocation(null);
+    let addressID = await addressService.addAddress({...address, Location:[selectedLocation.latitude, selectedLocation.longitude]});
 
-    console.log("Address added  successfully!");
+    // Clear input fields and selected location
+    setAddress({ city: address.City });
+    setSelectedLocation(userLocation);
+
+    // Show success message
+    Dialog.show({
+      type: ALERT_TYPE.SUCCESS,
+      title: "Address Added",
+      textBody: `The address 
+      ${address.HouseNo}, ${address.Address_line_1}, ${address.Address_line_2},s ${address.city} 
+      has been added successfully.\nID: ${addressID}`,
+      button: "Okay",
+    });
   };
 
   return (
     <>
-    <AppbarC title="Add Address" />
-    <View style={styles.container}>
-      <TextInput
-        style={styles.input}
-        placeholder="Address Line 1"
-        value={addressLine1}
-        onChangeText={setAddressLine1}
-      />
-      <TextInput
-        style={styles.input}
-        placeholder="Address Line 2"
-        value={addressLine2}
-        onChangeText={setAddressLine2}
-      />
-      <TextInput
-        style={styles.input}
-        placeholder="City"
-        value={city}
-        onChangeText={setCity}
-      />
-      <MapView
-        style={styles.map}
-        initialRegion={{
-          latitude: userLocation ? userLocation.latitude : 6.79,
-          longitude: userLocation ? userLocation.longitude : 79.86,
-          latitudeDelta: 0.0922,
-          longitudeDelta: 0.0421,
-        }}
-        onPress={handleMapPress}
-        onMarkerDragEnd= {handleMarkerDragEnd}
-        showsUserLocation={true}
-        userLocationAnnotationTitle={"You are here"}
-        followsUserLocation={true}
-        showsMyLocationButton={true}    
-      >
-        {selectedLocation && <Marker coordinate={selectedLocation} draggable />}
-      </MapView>
-      <TouchableOpacity style={[styles.button ,{ backgroundColor: theme.lightBackgroundColor2}]} onPress={handleSubmit}>
-        <Text >Submit</Text>
-      </TouchableOpacity>
+      <AppbarC title="Add Address" />
+      <View style={styles.container}>
+        <View style={styles.rowContainer}>
+          <TextInput
+            style={[
+              styles.input,
+              styles.halfInput,
+              {
+                borderColor: theme.accentColor,
+                fontStyle: "italic",
+                color: theme.lightBackgroundColor3,
+              },
+            ]}
+            value={address?.City}
+            onChangeText={(text) => setAddress({ ...address, City: text })}
+            placeholder="City"
+            editable={false}
+          />
 
-    </View></>
+          <TextInput
+            style={[styles.input, styles.halfInput]}
+            onChangeText={(text) => setAddress({ ...address, HouseNo: text })}
+            placeholder="House No"
+          />
+        </View>
+        <TextInput
+          style={styles.input}
+          onChangeText={(text) =>
+            setAddress({ ...address, Address_line_1: text })
+          }
+          placeholder="Enter Address Line 1"
+        />
+
+        <TextInput
+          style={styles.input}
+          onChangeText={(text) =>
+            setAddress({ ...address, Address_line_2: text })
+          }
+          placeholder="Enter Address Line 2"
+        />
+        <MapView
+          style={styles.map}
+          initialRegion={{
+            latitude: userLocation ? userLocation.latitude : 6.79,
+            longitude: userLocation ? userLocation.longitude : 79.86,
+            latitudeDelta: 0.0922,
+            longitudeDelta: 0.0421,
+          }}
+          onPress={handleMapPress}
+          onMarkerDragEnd={handleMarkerDragEnd}
+          showsUserLocation={true}
+          userLocationAnnotationTitle={"You are here"}
+          followsUserLocation={true}
+          showsMyLocationButton={true}
+        >
+          {selectedLocation && (
+            <Marker coordinate={selectedLocation} draggable />
+          )}
+        </MapView>
+        <TouchableOpacity
+          style={[
+            styles.button,
+            { backgroundColor: theme.lightBackgroundColor2 },
+          ]}
+          onPress={handleSubmit}
+        >
+          <Text>Submit</Text>
+        </TouchableOpacity>
+      </View>
+    </>
   );
 };
 
 const styles = StyleSheet.create({
+  rowContainer: {
+    flexDirection: "row",
+    justifyContent: "space-between",
+  },
+  halfInput: {
+    width: "49%",
+  },
   container: {
     flex: 1,
     padding: 20,
@@ -133,7 +203,7 @@ const styles = StyleSheet.create({
     height: 300,
     marginBottom: 10,
   },
-  button :{
+  button: {
     paddingVertical: 10,
     paddingHorizontal: 20,
     borderRadius: 5,

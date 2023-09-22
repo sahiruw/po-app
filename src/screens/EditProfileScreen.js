@@ -10,19 +10,21 @@ import {
 import * as ImagePicker from "expo-image-picker";
 import { useTheme } from "../assets/theme/theme";
 import userService from "../services/userService";
-import { Avatar } from "react-native-paper";
-
 import { AuthContext } from "../contextStore/AuthProvider";
 import LoadingScreen from "./LoadingScreen";
 
 const EditProfileScreen = ({ route, navigation }) => {
   const [image, setImage] = useState(null);
-  var { theme } = useTheme();
+  const [firstName, setFirstName] = useState(""); // Track first name separately
+  const [lastName, setLastName] = useState(""); // Track last name separately
+  const { theme } = useTheme();
   const { user, setUser } = useContext(AuthContext);
   const [loading, setLoading] = useState(false);
 
   useEffect(() => {
     setImage(user?.profile_picture);
+    setFirstName(user?.name?.first_name || ""); // Set the initial first name
+    setLastName(user?.name?.last_name || ""); // Set the initial last name
   }, []);
 
   const pickImage = async () => {
@@ -40,11 +42,23 @@ const EditProfileScreen = ({ route, navigation }) => {
 
   const handleSubmit = async () => {
     setLoading(true);
-    let url = image;
 
-    setUser({ ...user, profile_picture: url });
+    // Combine first name and last name into the user object
+    const updatedUser = {
+      ...user,
+      name: {
+        first_name: firstName,
+        last_name: lastName,
+      },
+      profile_picture: image,
+    };
 
-    await userService.updateUserData(user);
+    // Update the user data
+    await userService.updateUserData(updatedUser);
+
+    // Update the user context
+    setUser(updatedUser);
+
     navigation.navigate("Settings");
     setLoading(false);
   };
@@ -54,44 +68,64 @@ const EditProfileScreen = ({ route, navigation }) => {
       {loading && <LoadingScreen />}
       <View style={styles.container}>
         <TouchableOpacity onPress={pickImage}>
-          {/* <Text>{JSON.stringify(user)}</Text> */}
           <Image source={{ uri: image }} style={styles.profileImage} />
-          <Text style={styles.uploadText}>Upload Profile Picture</Text>
         </TouchableOpacity>
 
         <Text style={styles.label}>First Name</Text>
         <TextInput
           style={styles.input}
-          // placeholder={user?.name.first_name}
-          onChangeText={(text) =>
-            setUser({
-              ...user,
-              name: { first_name: text, last_name: user.name.last_name },
-            })
-          }
+          value={firstName} // Use the state variable to set the initial value
+          onChangeText={(text) => setFirstName(text)} // Update the first name
         />
 
         <Text style={styles.label}>Last Name</Text>
         <TextInput
           style={styles.input}
-          // placeholder={user?.name.last_name}
-          onChangeText={(text) =>
-            setUser({
-              ...user,
-              name: { last_name: text, first_name: user.name.first_name },
-            })
-          }
+          value={lastName} // Use the state variable to set the initial value
+          onChangeText={(text) => setLastName(text)} // Update the last name
         />
 
-        <TouchableOpacity style={styles.saveButton} onPress={handleSubmit}>
-          <Text style={styles.saveButtonText}>Save Changes</Text>
-        </TouchableOpacity>
+        <View style={{ top: 20 }}>
+          <TouchableOpacity
+            style={[
+              styles.button,
+              { backgroundColor: theme.lightBackgroundColor3 },
+            ]}
+            onPress={handleSubmit}
+          >
+            <Text style={styles.buttonText}>Save Changes</Text>
+          </TouchableOpacity>
+
+          <TouchableOpacity
+            style={[
+              styles.button,
+              { backgroundColor: theme.lightBackgroundColor3 },
+            ]}
+            onPress={() => {
+              navigation.navigate("Settings");
+            }}
+          >
+            <Text style={styles.buttonText}>Cancel</Text>
+          </TouchableOpacity>
+        </View>
       </View>
     </>
   );
 };
 
 const styles = StyleSheet.create({
+  button: {
+    marginTop: 10,
+    backgroundColor: "lightblue",
+    padding: 10,
+    borderRadius: 5,
+    width: 250,
+    alignItems: "center",
+  },
+  buttonText: {
+    color: "white",
+    fontWeight: "bold",
+  },
   container: {
     flex: 1,
     alignItems: "center",
