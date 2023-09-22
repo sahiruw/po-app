@@ -21,13 +21,14 @@ import addressUtils from "../../utils/addressUtils";
 import AppbarC from "../../components/AppBarC";
 import LoadingScreen from "../LoadingScreen";
 import { useNavigation } from "@react-navigation/core";
-
+import { useTheme } from "../../assets/theme/theme";
 import { MailListContext } from "../../contextStore/MailListProvider";
 import { useContext } from "react";
 
 const MAP_API_KEY = Constants.expoConfig.gmaps.apiKey;
 
 const MapScreen = () => {
+  const { theme } = useTheme();
   const [selectedMarker, setSelectedMarker] = useState(null);
   const [coordinates, setCoordinates] = useState([]);
   const { mailList, setMailList } = useContext(MailListContext);
@@ -42,20 +43,23 @@ const MapScreen = () => {
     // Fetch the coordinates from the API
     const fetchCoordinates = async () => {
       let route = await routeService.getRouteForToday();
+
       setMailList(route.mailItemData);
       let userloc = await addressUtils.getUserLocation();
       let coordinatesTemp = [userloc];
       for (let mail of route.mailItemData) {
+        // console.log(mail);
         let location = mail.receiver_address.Location;
         coordinatesTemp.push({
           latitude: location[0],
           longitude: location[1],
         });
       }
+
       setCoordinates(coordinatesTemp);
+      console.log("Coordinates fetched from API");
     };
     fetchCoordinates();
-    console.log("Coordinates fetched from API");
     setIsLoading(false);
   }, [coordinates.length]);
 
@@ -103,16 +107,17 @@ const MapScreen = () => {
     <>
       <AppbarC title="Map" />
       {isLoading && <LoadingScreen />}
-
       <View style={styles.container}>
-        {/* <Text>{JSON.stringify(coordinates)}</Text> */}
         <TouchableOpacity
+          style={[
+            styles.button,
+            { backgroundColor: theme.successColor },
+          ]}
           onPress={handleOpenInMaps}
-          style={styles.openInMapsButton}
         >
-          <Text>Open in Google Maps</Text>
+          <Text style={styles.buttonText}>Open in Google Maps</Text>
         </TouchableOpacity>
-
+            
         <MapView
           style={styles.map}
           initialRegion={{
@@ -157,13 +162,13 @@ const MapScreen = () => {
           )}
         </MapView>
 
-        {selectedMarker?.receiver_address_id && (
+        {selectedMarker?.receiver_address && (
           <>
             <View style={styles.markerInfo}>
               <Text style={{ fontWeight: "bold" }}>
                 <FontAwesome5
                   name={"envelope"}
-                  style={{ color: "#00b815", right:18 }}
+                  style={{ color: "#00b815", right: 18 }}
                   brand
                 />
                 {selectedMarker.type}
@@ -193,9 +198,9 @@ const MapScreen = () => {
 
               <TouchableOpacity
                 onPress={() => handleButton1Click(selectedMarker)}
-                style={styles.button}
+                style={[styles.button, { backgroundColor: theme.lightBackgroundColor2 }]}
               >
-                <Text>
+                <Text style={styles.buttonText}>
                   {isMailDelivered
                     ? selectedMarker.type != "Normal"
                       ? "Get Signature"
@@ -227,12 +232,19 @@ const styles = StyleSheet.create({
     marginLeft: 10,
     borderRadius: 10,
   },
+  buttonText: {
+    color: "white",
+    fontWeight: "bold",
+  },
   container: {
     flex: 1,
     backgroundColor: "white",
+    padding: 10,
   },
   map: {
     flex: 1,
+
+    top: 15,
   },
   markerInfo: {
     position: "absolute",
@@ -252,15 +264,9 @@ const styles = StyleSheet.create({
   },
   button: {
     marginTop: 10,
-    backgroundColor: "lightblue",
     padding: 10,
     borderRadius: 5,
-  },
-  openInMapsButton: {
-    marginTop: 10,
-    backgroundColor: "lightgreen",
-    padding: 10,
-    borderRadius: 5,
+    alignItems: "center",
   },
   overlay: {
     position: "absolute",

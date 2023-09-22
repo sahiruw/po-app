@@ -21,7 +21,7 @@ address_ids = [doc.id for doc in source_doc_ref]
 
 mailitems_ref = db.collection("MailServiceItem")
 
-for i in range(100):
+for i in range(10):
     mailitem = {
         "receiver_name":  fake.name(),
         "receiver_address": random.choice(address_ids),  # Reference to the Address document

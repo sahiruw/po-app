@@ -12,9 +12,15 @@ const getRouteDataForToday = async () => {
   let routes = await routeData.getRoute(dateKey, user.uid);
   // console.log(routes)
   // setMailList(routes.mailItemData);
+
   return routes;
+};
+
+const removeRoute = async () => {
+  await routeData.removeRoute();
 };
 
 export default {
   getRouteForToday: getRouteDataForToday,
+  removeRoute,
 };

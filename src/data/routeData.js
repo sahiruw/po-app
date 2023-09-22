@@ -11,6 +11,8 @@ const getRoute = async (dateKey, uid) => {
 
   if (routeStored?.dateKey === dateKey) {
     console.log("route from  async");
+    // console.log(routeStored);
+
     return routeStored;
   } else {
     console.log("reading route from firebase");
@@ -21,19 +23,23 @@ const getRoute = async (dateKey, uid) => {
     if (docSnap.exists()) {
       let docSnapData = docSnap.data();
       let assignedMails = docSnapData[uid];
-      
+
       if (assignedMails) {
         for (let mail of assignedMails) {
+          // console.log("mail", mail);
           let maildata = await mailItemData.getDetailsofMailItemByID(mail);
           let recipientAddress = await addressData.getDetailsofAddress(
-            maildata.receiver_address_id
+            maildata.receiver_address
           );
+          // console.log("recipientAddress", maildata.receiver_address, recipientAddress);
           maildata.receiver_address = recipientAddress;
           maildata['id'] = mail;
+          // console.log("maildata", maildata);
           if (maildata) {
             mailsForToday.push(maildata);
           }
         }
+
 
       }
 
@@ -52,6 +58,12 @@ const saveRoute = async (route) => {
   await AsyncStorage.setItem("route", JSON.stringify(route));
 };
 
+const removeRoute = async () => {
+  await AsyncStorage.removeItem("route");
+};
+
 export default {
   getRoute,
+  saveRoute,
+  removeRoute,
 };

@@ -70,10 +70,11 @@ const AddAddressScreen = () => {
       });
       return;
     }
+
     if (
-      address.HouseNo == "" ||
-      address.Address_line_1 == "" ||
-      address.Address_line_2 == ""
+      !address.HouseNo  ||
+      !address.Address_line_1  ||
+      !address.Address_line_2 
     ) {
       Dialog.show({
         type: ALERT_TYPE.WARNING,
@@ -83,7 +84,7 @@ const AddAddressScreen = () => {
       });
       return;
     }
-
+    console.log(address);
     // Save the address  and location to the database
     let addressID = await addressService.addAddress({...address, Location:[selectedLocation.latitude, selectedLocation.longitude]});
 

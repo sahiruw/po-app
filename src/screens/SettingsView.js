@@ -15,6 +15,7 @@ import userService from "../services/userService";
 import userUtils from "../utils/userUtils";
 
 import {AuthContext} from "../contextStore/AuthProvider";
+import routeService from "../services/routeService";
 
 const SettingsView = () => {
   var { theme } = useTheme();
@@ -30,11 +31,12 @@ const SettingsView = () => {
   const handleLogout = async () => {
     try {
       await signOut(auth);
-      await AsyncStorage.removeItem("user");
-      // await userService.removeUserData();
-      setTimeout(() => {
-        console.log("Waited 1 second");
-      }, 1000);
+      // await AsyncStorage.removeItem("user");
+      await routeService.removeRoute();
+      setUser(null);
+      await userService.removeUserData();
+      
+
       navigation.navigate("Login");
       console.log("User signed out");
     } catch (error) {

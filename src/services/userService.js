@@ -14,8 +14,7 @@ const getActiveUserData = async () => {
 }
 
 const removeUserData = async () => {
-    const {user, setUser} = useContext(AuthContext);
-    setUser(null);
+
     await userData.removeUserData();
 }
 
