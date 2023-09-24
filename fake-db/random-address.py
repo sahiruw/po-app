@@ -37,7 +37,7 @@ poIds = {
     "Moratuwa": "po-2",
 }
 # Define a radius (in meters) around the University to search for random addresses
-radius = 5000  # You can adjust this radius as needed
+radius = 1000  # You can adjust this radius as needed
 
 
 def randomAddress(city):

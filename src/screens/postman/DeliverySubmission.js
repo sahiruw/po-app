@@ -38,8 +38,20 @@ const DeliverySubmission = ({ route, navigation }) => {
   const [note, setNote] = useState("");
   const [isLoading, setIsLoading] = useState(false)
 
+  const updateMailList = async (mailID, status) => {
+    // console.log(mailList)
+    // console.log(mailID, status)
+    let mails = mailList.map((mail) => {
+      if (mail.id == mailID) {
+        mail.status = status;
+      }
+      return mail;
+    });
+    setMailList(mails);
+  };
+
   const handleSubmit = async () => {
-    // setIsLoading(true)
+    setIsLoading(true)
     let data = {
       status: AppConstants.MailDeliveryAttemptStatus.Failed,
       note: note,
@@ -55,6 +67,7 @@ const DeliverySubmission = ({ route, navigation }) => {
       };
     }
 
+    updateMailList(selectedMarker.id, data.status);
     let res = await mailItemService.updateMailItemdeliveryStatus(
       selectedMarker,
       data

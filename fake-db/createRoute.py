@@ -11,17 +11,24 @@ db = firestore.client()
 
 
 # Reference to the source document
-source_doc_ref = db.collection("MailServiceItem").list_documents()
-doc_ids = [doc.id for doc in source_doc_ref]
+# source_doc_ref = db.collection("MailServiceItem").list_documents()
+# doc_ids = [doc.id for doc in source_doc_ref]
+
+query = db.collection("MailServiceItem").where("status", "==", "To be Delivered").stream()
+
+# Get the document IDs of the matching documents
+doc_ids = [doc.id for doc in query]
+
+print(doc_ids)
 
 # print(doc_ids)
 new_data = {
-    '9wKkbgqZZPOP6mAioP1ge5zdORe2': random.sample(doc_ids, random.randint(7,10))
+    '9wKkbgqZZPOP6mAioP1ge5zdORe2': random.sample(doc_ids, random.randint(6, len(doc_ids) ))
 }
 print(new_data)
 
 # Create a new document with a different ID
-new_document_ref = db.collection("Route").document("24092023")
+new_document_ref = db.collection("Route").document("25092023")
 
 # Set the data of the new document with the data from the source document
 new_document_ref.set(new_data)

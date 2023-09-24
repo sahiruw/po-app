@@ -39,16 +39,24 @@ const MapScreen = () => {
   const [isLoading, setIsLoading] = useState(false);
   const navigation = useNavigation();
 
-  useEffect(() => {
+  const fetchMailList = async () => {
     setIsLoading(true);
-    // Fetch the coordinates from the API
-    const fetchCoordinates = async () => {
-      let route = await routeService.getRouteForToday();
+    let route = await routeService.getRouteForToday();
+    setMailList(route.mailItemData);
+    console.log("Mail List fetched from API");
+    setIsLoading(false);
+  };
 
-      setMailList(route.mailItemData);
+  const fetchCoordinates = async () => {
+    setIsLoading(true);
+
+    if (mailList) {
+      // update new mail list in async storage
+      await routeService.updateMailListofroute(mailList);
+      
       let userloc = await addressUtils.getUserLocation();
       let coordinatesTemp = [userloc];
-      for (let mail of route.mailItemData) {
+      for (let mail of mailList) {
         // console.log(mail.receiver_address_id);
         let location = mail.receiver_address.Location;
         coordinatesTemp.push({
@@ -56,24 +64,27 @@ const MapScreen = () => {
           longitude: location[1],
         });
       }
-
+      // console.log(coordinatesTemp);
       setCoordinates(coordinatesTemp);
       console.log("Coordinates fetched from API");
-    };
-    fetchCoordinates();
+    }
     setIsLoading(false);
-  }, [coordinates.length]);
+  };
+
+  useEffect(() => {
+    fetchCoordinates();
+  }, [mailList]);
+
+  useEffect(() => {
+    fetchMailList();
+  }, []);
 
   const handleMarkerPress = (index, coord) => {
     setSelectedMarker({ index, ...mailList[index - 1] });
     setIsMailDelivered(false);
   };
 
-  const handleButton1Click = (marker) => {
-    // Handle the first button click action here
-
-    // console.log("Button 1 clicked for marker:", marker);
-
+  const handleMarkAttempt = (marker) => {
     if (marker.type != "Normal" || !isMailDelivered) {
       navigation.navigate("DeliverySubmission", { isMailDelivered, marker });
     }
@@ -101,23 +112,19 @@ const MapScreen = () => {
     setSelectedMarker(null);
   };
 
-  // if (isLoading) {
-  //   return <LoadingScreen />;
-  // }
   return (
     <>
       <AppbarC title="Map" />
       {isLoading && <LoadingScreen />}
       <View style={styles.container}>
         <TouchableOpacity
-          style={[styles.button, { backgroundColor: theme.successColor }]}
+          style={[styles.button, { backgroundColor: theme.midGreenBackgroundColor }]}
           onPress={handleOpenInMaps}
         >
           <Text style={styles.buttonText}>Open in Google Maps</Text>
         </TouchableOpacity>
         {/* <Text>{JSON.stringify(coordinates)}</Text> */}
 
-        
         <MapView
           style={styles.map}
           initialRegion={{
@@ -139,11 +146,13 @@ const MapScreen = () => {
                 pinColor={
                   mailList[index - 1]?.type === AppConstants.MailItems.Normal
                     ? AppConstants.MailItemMarkerColors.Normal
-                    : mailList[index - 1]?.type === AppConstants.MailItems.Registered
+                    : mailList[index - 1]?.type ===
+                      AppConstants.MailItems.Registered
                     ? AppConstants.MailItemMarkerColors.Registered
                     : mailList[index - 1]?.type === AppConstants.MailItems.Logi
                     ? AppConstants.MailItemMarkerColors.Logi
-                    : mailList[index - 1]?.type === AppConstants.MailItems.Return
+                    : mailList[index - 1]?.type ===
+                      AppConstants.MailItems.Return
                     ? AppConstants.MailItemMarkerColors.Return
                     : "black" // Default color if none of the types match
                 }
@@ -164,14 +173,27 @@ const MapScreen = () => {
 
         {selectedMarker?.receiver_address && (
           <>
-            <View style={styles.markerInfo}>
+            <View
+              style={[
+                styles.markerInfo,
+                {
+                  backgroundColor:
+                    selectedMarker.status == AppConstants.MailItemStatus.Failed
+                      ? theme.lightRedBackgroundColor
+                      : selectedMarker.status ==
+                        AppConstants.MailItemStatus.Delivered
+                      ? theme.lightGreenBackgroundColor
+                      : theme.backgroundColor,
+                },
+              ]}
+            >
               <Text style={{ fontWeight: "bold" }}>
                 <FontAwesome5
                   name={"envelope"}
                   style={{ color: "#00b815", right: 18 }}
                   brand
                 />
-                {selectedMarker.type}
+                {selectedMarker.type} - {selectedMarker.status}
               </Text>
 
               <Text style={{ fontWeight: "bold" }}>
@@ -182,35 +204,44 @@ const MapScreen = () => {
                   selectedMarker.receiver_address
                 )}`}
               </Text>
-              <View
-                style={{
-                  flexDirection: "row",
-                  alignItems: "center",
-                  marginTop: 16,
-                }}
-              >
-                <Text style={{ marginRight: 8 }}>Is the mail delivered?</Text>
-                <Switch
-                  value={isMailDelivered}
-                  onValueChange={(value) => setIsMailDelivered(value)}
-                />
-              </View>
+              {selectedMarker.status !=
+              AppConstants.MailItemStatus.OutforDelivery ? (
+                <></>
+              ) : (
+                <>
+                  <View
+                    style={{
+                      flexDirection: "row",
+                      alignItems: "center",
+                      marginTop: 16,
+                    }}
+                  >
+                    <Text style={{ marginRight: 8 }}>
+                      Is the mail delivered?
+                    </Text>
+                    <Switch
+                      value={isMailDelivered}
+                      onValueChange={(value) => setIsMailDelivered(value)}
+                    />
+                  </View>
 
-              <TouchableOpacity
-                onPress={() => handleButton1Click(selectedMarker)}
-                style={[
-                  styles.button,
-                  { backgroundColor: theme.lightBackgroundColor2 },
-                ]}
-              >
-                <Text style={styles.buttonText}>
-                  {isMailDelivered
-                    ? selectedMarker.type != "Normal"
-                      ? "Get Signature"
-                      : "Mark as Delivered"
-                    : "Add Delivery Failure Notice"}
-                </Text>
-              </TouchableOpacity>
+                  <TouchableOpacity
+                    onPress={() => handleMarkAttempt(selectedMarker)}
+                    style={[
+                      styles.button,
+                      { backgroundColor: theme.lightBackgroundColor2 },
+                    ]}
+                  >
+                    <Text style={styles.buttonText}>
+                      {isMailDelivered
+                        ? selectedMarker.type != AppConstants.MailItems.Normal
+                          ? "Get Signature"
+                          : "Mark as Delivered"
+                        : "Add Delivery Failure Notice"}
+                    </Text>
+                  </TouchableOpacity>
+                </>
+              )}
             </View>
             <TouchableOpacity
               style={styles.overlay}

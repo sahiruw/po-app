@@ -1,8 +1,6 @@
 import { AppConstants } from "../assets/constants";
 import { auth, db } from "../config/firebase";
 import { collection, doc, getDoc, writeBatch } from "firebase/firestore";
-import storeFirebaseData from "./storeFirebaseData";
-import imageUtils from "../utils/imageUtils";
 
 const getDetailsofMailItemByID = async (mailItemId) => {
   const docRef = doc(db, "MailServiceItem", mailItemId);
@@ -13,6 +11,25 @@ const getDetailsofMailItemByID = async (mailItemId) => {
   console.log("No mail item document!");
   return null;
 };
+
+const updateStatusOfMailItems = async (mailItemIDs, status, prevStatusToCompare) => {
+  const batch = writeBatch(db);
+  for (let mailItemID of mailItemIDs) {
+    const docRef = doc(db, "MailServiceItem", mailItemID);
+    const docSnap = await getDoc(docRef);
+    if (docSnap.exists()) {
+      let mailItemData = docSnap.data();
+      if (prevStatusToCompare) {
+        if (mailItemData.status == prevStatusToCompare) {
+          batch.update(docRef, { status });
+
+        }
+      }
+    }
+  }
+  await batch.commit()
+  return true
+}
 
 const markMailItemAsDelivered = async (mailItemData, data) => {
   const batch = writeBatch(db);
@@ -49,7 +66,7 @@ const markMailItemAsNotDelivered = async (mailItemData, data) => {
 
   // update mail item status
   prevAttempts.push(deliveryAttemptRef.id);
-  let sts = AppConstants.MailItemStatus.TobeDelivered;
+  let sts = AppConstants.MailItemStatus.Failed;
   
   if (prevAttempts.length >= 3) {
     if (mailItemData.type == AppConstants.MailItemStatus.Normal) {
@@ -75,4 +92,5 @@ export default {
   getDetailsofMailItemByID,
   markMailItemAsNotDelivered,
   markMailItemAsDelivered,
+  updateStatusOfMailItems
 };

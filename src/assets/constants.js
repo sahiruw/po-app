@@ -37,6 +37,7 @@ export const AppConstants = {
         "DeliveryCancelled": "Delivery Cancelled",
         "Returned": "Returned",
         "Delivered": "Delivered",
+        "Failed": "Failed",
         "Dispatched": "Dispatched",
         "Neglected": "Neglected",
     },

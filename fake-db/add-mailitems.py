@@ -20,7 +20,7 @@ address_ids = [doc.id for doc in source_doc_ref]
 
 
 mailitems_ref = db.collection("MailServiceItem")
-
+start = 150
 for i in range(50):
     mailitem = {
         "receiver_name":  fake.name(),
@@ -43,15 +43,15 @@ for i in range(50):
 
     mail_type = mailitem["type"]
     if mail_type == "normal post":
-        mail_id = "10" + str(i).zfill(6)
+        mail_id = "10" + str(i+start).zfill(6)
     elif mail_type == "registered post":
-        mail_id = "11" + str(i).zfill(6)
+        mail_id = "11" + str(i+start).zfill(6)
     elif mail_type == "logi post":
-        mail_id = "12" + str(i).zfill(6)
+        mail_id = "12" + str(i+start).zfill(6)
     elif mail_type == "fast-track-courier":
-        mail_id = "13" + str(i).zfill(6)
+        mail_id = "13" + str(i+start).zfill(6)
     elif mail_type == "return":
-        mail_id = "14" + str(i).zfill(6)
+        mail_id = "14" + str(i+start).zfill(6)
 
     mailitems_ref.document(mail_id).set(mailitem)
     print(mailitem)

@@ -20,7 +20,12 @@ const removeRoute = async () => {
   await routeData.removeRoute();
 };
 
+const updateMailListofroute = async (mailList) => {
+  await routeData.updateMailListofroute(mailList);
+}
+
 export default {
   getRouteForToday: getRouteDataForToday,
   removeRoute,
+  updateMailListofroute
 };

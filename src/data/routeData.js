@@ -4,6 +4,7 @@ import { auth, db } from "../config/firebase";
 
 import mailItemData from "./mailItemData";
 import addressData from "./addressData";
+import { AppConstants } from "../assets/constants";
 
 const getRoute = async (dateKey, uid) => {
   let routeRaw = await AsyncStorage.getItem("route");
@@ -25,6 +26,12 @@ const getRoute = async (dateKey, uid) => {
       let assignedMails = docSnapData[uid];
 
       if (assignedMails) {
+        await mailItemData.updateStatusOfMailItems(
+          assignedMails,
+          AppConstants.MailItemStatus.OutforDelivery,
+          AppConstants.MailItemStatus.TobeDelivered
+        );
+
         for (let mail of assignedMails) {
           // console.log("mail", mail);
           let maildata = await mailItemData.getDetailsofMailItemByID(mail);
@@ -33,14 +40,12 @@ const getRoute = async (dateKey, uid) => {
           );
           // console.log("recipientAddress", maildata.receiver_address, recipientAddress);
           maildata.receiver_address = recipientAddress;
-          maildata['id'] = mail;
+          maildata["id"] = mail;
           // console.log("maildata", maildata);
           if (maildata) {
             mailsForToday.push(maildata);
           }
         }
-
-
       }
 
       let route = { dateKey, uid, mailItemData: mailsForToday };
@@ -50,7 +55,7 @@ const getRoute = async (dateKey, uid) => {
     }
     console.log("No route document!");
     return { dateKey, uid, mailItemData: mailsForToday };
-    console.log("Route imported")
+    console.log("Route imported");
   }
 };
 
@@ -62,8 +67,19 @@ const removeRoute = async () => {
   await AsyncStorage.removeItem("route");
 };
 
+const updateMailListofroute = async (mailList) => {
+  let routeRaw = await AsyncStorage.getItem("route");
+  let routeStored = JSON.parse(routeRaw);
+
+  if (routeStored) {
+    routeStored.mailItemData = mailList;
+    await AsyncStorage.setItem("route", JSON.stringify(routeStored));
+  }
+};
+
 export default {
   getRoute,
   saveRoute,
   removeRoute,
+  updateMailListofroute,
 };
