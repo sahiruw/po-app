@@ -11,10 +11,7 @@ import {
 } from "firebase/firestore";
 import {
   getStorage,
-  ref,
-  uploadBytesResumable,
-  getDownloadURL,
-  listAll,
+
 } from "firebase/storage";
 import Constants from "expo-constants";
 

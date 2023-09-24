@@ -5,13 +5,15 @@ import {
   ref,
   uploadBytesResumable,
   getDownloadURL,
+  uploadString,
 } from "firebase/storage";
 
 const uploadImage = (path, buffer) => {
+  // console.log("uploadImage", buffer);
   return new Promise((resolve, reject) => {
     const storageRef = ref(store, path);
     const metadata = {
-      contentType: 'image/jpeg'
+      contentType: "image/jpeg",
     };
 
     const uploadTask = uploadBytesResumable(storageRef, buffer, metadata);
@@ -20,7 +22,8 @@ const uploadImage = (path, buffer) => {
     uploadTask.on(
       "state_changed",
       (snapshot) => {
-        const progress = (snapshot.bytesTransferred / snapshot.totalBytes) * 100;
+        const progress =
+          (snapshot.bytesTransferred / snapshot.totalBytes) * 100;
         console.log("Upload is " + progress + "% done");
       },
       (error) => {

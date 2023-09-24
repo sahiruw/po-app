@@ -29,7 +29,7 @@ const getRoute = async (dateKey, uid) => {
           // console.log("mail", mail);
           let maildata = await mailItemData.getDetailsofMailItemByID(mail);
           let recipientAddress = await addressData.getDetailsofAddress(
-            maildata.receiver_address
+            maildata.receiver_address_id
           );
           // console.log("recipientAddress", maildata.receiver_address, recipientAddress);
           maildata.receiver_address = recipientAddress;

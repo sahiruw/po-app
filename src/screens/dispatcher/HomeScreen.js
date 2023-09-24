@@ -12,7 +12,7 @@ const HomeScreen = ({ navigation }) => {
 
   useEffect(() => {
     async function getUser() {
-      let user = await userService.getUserData();
+      let user = await userService.getActiveUserData();
       setUser(user);
     }
     getUser();
@@ -23,7 +23,7 @@ const HomeScreen = ({ navigation }) => {
     <>
       <AppBarC title="Home" />
       <View style={[styles.container]}>
-        <Text>HomeScreen of the Dispatcher</Text>
+        <Text>HomeScreen of the Dispatcher{JSON.stringify(user)}</Text>
         <ModernDateTimeDisplay />
       </View>
     </>

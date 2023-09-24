@@ -16,11 +16,13 @@ import AppbarC from "../../components/AppBarC";
 import userService from "../../services/userService";
 import postOfficeService from "../../services/postOfficeService";
 import addressService from "../../services/addressService";
+import LoadingScreen from "../LoadingScreen";
 
 const AddAddressScreen = () => {
   const [address, setAddress] = useState(null);
   const [selectedLocation, setSelectedLocation] = useState(userLocation);
   const [userLocation, setUserLocation] = useState(null);
+  const [isLoading, setIsLoading] = useState(false);
   var { theme } = useTheme();
 
   useEffect(() => {
@@ -35,12 +37,14 @@ const AddAddressScreen = () => {
   useEffect(() => {
     // Get users city from the selected location
     const getCity = async () => {
-      let dispatcherActive = await userService.getActiveUserData();
+      setIsLoading(true);
+      let postmanActive = await userService.getActiveUserData();
       let po = await postOfficeService.getDetailsofPostofficeByID(
-        dispatcherActive.postoffice
+        postmanActive.postoffice
       );
 
-      setAddress({ ...address, City: po.Name, RegionID: dispatcherActive.postoffice });
+      setAddress({ ...address, City: po.Name, RegionID: postmanActive.region, District: po.District });
+      setIsLoading(false);
     };
     getCity();
   }, []);
@@ -60,6 +64,7 @@ const AddAddressScreen = () => {
   };
 
   const handleSubmit = async () => {
+    setIsLoading(true);
     // Check if a location is selected
     if (!selectedLocation) {
       Dialog.show({
@@ -87,11 +92,12 @@ const AddAddressScreen = () => {
     console.log(address);
     // Save the address  and location to the database
     let addressID = await addressService.addAddress({...address, Location:[selectedLocation.latitude, selectedLocation.longitude]});
-
+    console.log(addressID);
     // Clear input fields and selected location
-    setAddress({ city: address.City });
+    setAddress({ City: address.City, District: address.District, RegionID: address.RegionID });
     setSelectedLocation(userLocation);
 
+    setIsLoading(false);
     // Show success message
     Dialog.show({
       type: ALERT_TYPE.SUCCESS,
@@ -106,6 +112,7 @@ const AddAddressScreen = () => {
   return (
     <>
       <AppbarC title="Add Address" />
+      {isLoading && <LoadingScreen />}
       <View style={styles.container}>
         <View style={styles.rowContainer}>
           <TextInput

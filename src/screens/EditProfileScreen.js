@@ -20,6 +20,7 @@ const EditProfileScreen = ({ route, navigation }) => {
   const { theme } = useTheme();
   const { user, setUser } = useContext(AuthContext);
   const [loading, setLoading] = useState(false);
+  const [profilePicChanged, setProfilePicChanged] = useState(false); // Track if the profile picture has changed
 
   useEffect(() => {
     setImage(user?.profile_picture);
@@ -37,6 +38,7 @@ const EditProfileScreen = ({ route, navigation }) => {
 
     if (!result.cancelled) {
       setImage(result.assets[0].uri);
+      setProfilePicChanged(true);
     }
   };
 
@@ -54,7 +56,7 @@ const EditProfileScreen = ({ route, navigation }) => {
     };
 
     // Update the user data
-    await userService.updateUserData(updatedUser);
+    await userService.updateUserData(updatedUser, profilePicChanged);
 
     // Update the user context
     setUser(updatedUser);

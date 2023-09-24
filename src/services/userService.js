@@ -24,7 +24,12 @@ const saveUserProfilePicture = async (uri) => {
 }
 
 
-const updateUserData = async (user) => {
+const updateUserData = async (user, isProfilePictureChanged) => {
+    if (isProfilePictureChanged) {
+        let url = await userData.saveUserProfilePicture(user.profile_picture);
+        user.profile_picture = url;
+    }
+    
     await userData.saveUserdata(user, true);
 }
 

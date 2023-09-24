@@ -11,10 +11,12 @@ async function getUserData(uid, email) {
   if (user) {
     return JSON.parse(user);
   } else {
+    
     if (uid != null) {
+      
       const docRef = doc(db, "employees", uid);
       const docSnap = await getDoc(docRef);
-
+      
       if (docSnap.exists()) {
         // console.log("Document data:", docSnap.data());
         user = { uid, email, ...docSnap.data() };
@@ -22,6 +24,7 @@ async function getUserData(uid, email) {
         return user;
       }
     }
+    
     // docSnap.data() will be undefined in this case
     console.log("No sch document!");
     return null;
@@ -29,7 +32,7 @@ async function getUserData(uid, email) {
 }
 
 async function saveUserdata(user, saveToDatabse = false) {
-  console.log("Saving user data", user);
+
   await AsyncStorage.setItem("user", JSON.stringify(user));
   if (saveToDatabse) {
     const docRef = doc(db, "employees", user.uid);

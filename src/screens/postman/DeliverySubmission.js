@@ -15,6 +15,7 @@ import {
   TextInput,
   Button,
 } from "react-native";
+import { ALERT_TYPE, Dialog, Toast } from "react-native-alert-notification";
 
 import { SketchCanvas } from "rn-perfect-sketch-canvas";
 import AppbarC from "../../components/AppBarC";
@@ -23,6 +24,8 @@ import { MailListContext } from "../../contextStore/MailListProvider";
 import userUtils from "../../utils/userUtils";
 import BottomBox from "../../components/BottomBox";
 import { useTheme } from "../../assets/theme/theme";
+import mailItemService from "../../services/mailItemService";
+import { AppConstants } from "../../assets/constants";
 
 const DeliverySubmission = ({ route, navigation }) => {
   const { mailList, setMailList } = useContext(MailListContext);
@@ -33,15 +36,54 @@ const DeliverySubmission = ({ route, navigation }) => {
   const [selectedMarker, setSelectedMarker] = useState(route.params?.marker);
   const canvasRef = useRef();
   const [note, setNote] = useState("");
+  const [isLoading, setIsLoading] = useState(false)
 
-  const handleSubmit = () => {
-    console.log(selectedMarker);
+  const handleSubmit = async () => {
+    // setIsLoading(true)
+    let data = {
+      status: AppConstants.MailDeliveryAttemptStatus.Failed,
+      note: note,
+      timestamp: new Date(),
+    };
+
+    if (isMailDelivered) {
+      const imageURI = await canvasRef.current?.toBase64()
+      data = {
+        status: AppConstants.MailDeliveryAttemptStatus.Delivered,
+        sign: imageURI,
+        timestamp: new Date(),
+      };
+    }
+
+    let res = await mailItemService.updateMailItemdeliveryStatus(
+      selectedMarker,
+      data
+    );
+
+    setIsLoading(false)
+    if (res) {
+      Dialog.show({
+        type: ALERT_TYPE.SUCCESS,
+        title: "Success",
+        textBody: `Mail item status updated successfully.`,
+        button: "Okay",
+      });
+      navigation.goBack();
+    } else {
+      Dialog.show({
+        type: ALERT_TYPE.WARNING,
+        title: "Unsuccessful",
+        textBody: `Mail item status update failed.`,
+        button: "Okay",
+      });
+    }
   };
 
   return (
     <>
       <AppbarC title="Update Status" showBackButton={true} />
-      {/* <Text>{JSON.stringify(mailList)}</Text> */}
+      {/* <Text>{JSON.stringify(hehe)}</Text> */}
+      {isLoading && <LoadingScreen/>}
       <View style={styles.container}>
         {isMailDelivered && (
           <>
@@ -60,7 +102,7 @@ const DeliverySubmission = ({ route, navigation }) => {
                 marginRight: 10,
                 marginTop: 10,
                 marginLeft: 10,
-                borderStyle: 'dashed',
+                borderStyle: "dashed",
               }}
             />
             <View style={styles.container2}>
@@ -105,7 +147,8 @@ const DeliverySubmission = ({ route, navigation }) => {
 
         {!isMailDelivered && (
           <>
-            <Text style={{ padding: 20 }}>Enter a not about the failure of delivery
+            <Text style={{ padding: 20 }}>
+              Enter a not about the failure of delivery
             </Text>
             <TextInput
               placeholder="Enter note here..."
@@ -129,7 +172,9 @@ const DeliverySubmission = ({ route, navigation }) => {
             styles.button,
             { backgroundColor: theme.lightBackgroundColor2, top: 20 },
           ]}
-          onPress={() => {navigation.goBack();}}
+          onPress={() => {
+            navigation.goBack();
+          }}
         >
           <Text style={styles.buttonText}>Cancel</Text>
         </TouchableOpacity>

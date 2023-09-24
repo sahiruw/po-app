@@ -24,6 +24,7 @@ import { useNavigation } from "@react-navigation/core";
 import { useTheme } from "../../assets/theme/theme";
 import { MailListContext } from "../../contextStore/MailListProvider";
 import { useContext } from "react";
+import { AppConstants } from "../../assets/constants";
 
 const MAP_API_KEY = Constants.expoConfig.gmaps.apiKey;
 
@@ -48,7 +49,7 @@ const MapScreen = () => {
       let userloc = await addressUtils.getUserLocation();
       let coordinatesTemp = [userloc];
       for (let mail of route.mailItemData) {
-        // console.log(mail);
+        // console.log(mail.receiver_address_id);
         let location = mail.receiver_address.Location;
         coordinatesTemp.push({
           latitude: location[0],
@@ -109,15 +110,14 @@ const MapScreen = () => {
       {isLoading && <LoadingScreen />}
       <View style={styles.container}>
         <TouchableOpacity
-          style={[
-            styles.button,
-            { backgroundColor: theme.successColor },
-          ]}
+          style={[styles.button, { backgroundColor: theme.successColor }]}
           onPress={handleOpenInMaps}
         >
           <Text style={styles.buttonText}>Open in Google Maps</Text>
         </TouchableOpacity>
-            
+        {/* <Text>{JSON.stringify(coordinates)}</Text> */}
+
+        
         <MapView
           style={styles.map}
           initialRegion={{
@@ -137,14 +137,14 @@ const MapScreen = () => {
                 onPress={() => handleMarkerPress(index, coord)}
                 //colour of the marker
                 pinColor={
-                  mailList[index - 1]?.type === "Normal"
-                    ? "green"
-                    : mailList[index - 1]?.type === "Registered"
-                    ? "blue"
-                    : mailList[index - 1]?.type === "Parcel"
-                    ? "orange"
-                    : mailList[index - 1]?.type === "Return"
-                    ? "red"
+                  mailList[index - 1]?.type === AppConstants.MailItems.Normal
+                    ? AppConstants.MailItemMarkerColors.Normal
+                    : mailList[index - 1]?.type === AppConstants.MailItems.Registered
+                    ? AppConstants.MailItemMarkerColors.Registered
+                    : mailList[index - 1]?.type === AppConstants.MailItems.Logi
+                    ? AppConstants.MailItemMarkerColors.Logi
+                    : mailList[index - 1]?.type === AppConstants.MailItems.Return
+                    ? AppConstants.MailItemMarkerColors.Return
                     : "black" // Default color if none of the types match
                 }
               />
@@ -175,7 +175,7 @@ const MapScreen = () => {
               </Text>
 
               <Text style={{ fontWeight: "bold" }}>
-                {`${selectedMarker.receiver_name.first_name} ${selectedMarker.receiver_name.mid_name} ${selectedMarker.receiver_name.last_name}`}
+                {selectedMarker.receiver_name}
               </Text>
               <Text>
                 {`No: ${addressUtils.formatAddress(
@@ -198,7 +198,10 @@ const MapScreen = () => {
 
               <TouchableOpacity
                 onPress={() => handleButton1Click(selectedMarker)}
-                style={[styles.button, { backgroundColor: theme.lightBackgroundColor2 }]}
+                style={[
+                  styles.button,
+                  { backgroundColor: theme.lightBackgroundColor2 },
+                ]}
               >
                 <Text style={styles.buttonText}>
                   {isMailDelivered

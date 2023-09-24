@@ -23,8 +23,8 @@ print(doc_ids)
 new_data = {
     'mail_service_items': random.sample(doc_ids, 5),
     'date': '22092023',
-    'destination_post_office_id': 'po-4',
-    'origin_post_office_id': 'po-1',
+    'destination_post_office_id': 'po-1',
+    'origin_post_office_id': 'po-4',
     'status': 'Queued'
 }
 
