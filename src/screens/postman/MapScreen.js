@@ -12,6 +12,7 @@ import {
 import MapView, { Marker } from "react-native-maps";
 import MapViewDirections from "react-native-maps-directions";
 
+import Icon from "react-native-vector-icons/MaterialCommunityIcons";
 import FontAwesome5 from "react-native-vector-icons/FontAwesome5";
 
 import Constants from "expo-constants";
@@ -53,7 +54,7 @@ const MapScreen = () => {
     if (mailList) {
       // update new mail list in async storage
       await routeService.updateMailListofroute(mailList);
-      
+
       let userloc = await addressUtils.getUserLocation();
       let coordinatesTemp = [userloc];
       for (let mail of mailList) {
@@ -118,7 +119,10 @@ const MapScreen = () => {
       {isLoading && <LoadingScreen />}
       <View style={styles.container}>
         <TouchableOpacity
-          style={[styles.button, { backgroundColor: theme.midGreenBackgroundColor }]}
+          style={[
+            styles.button,
+            { backgroundColor: theme.midGreenBackgroundColor },
+          ]}
           onPress={handleOpenInMaps}
         >
           <Text style={styles.buttonText}>Open in Google Maps</Text>
@@ -133,14 +137,15 @@ const MapScreen = () => {
             latitudeDelta: 0.0922,
             longitudeDelta: 0.0421,
           }}
-          showsUserLocation={true}
+          zoomControlEnabled={true}
+          zoomEnabled={true}
         >
           {coordinates.length > 0 &&
-            coordinates.slice(1).map((coord, index) => (
+            coordinates.map((coord, index) => (
               <Marker
                 key={index}
                 coordinate={coord}
-                title={`Point ${index + 1}`}
+                title={index == 0 ? "Your Location" : `Item ${index + 1}`}
                 onPress={() => handleMarkerPress(index, coord)}
                 //colour of the marker
                 pinColor={
@@ -188,11 +193,6 @@ const MapScreen = () => {
               ]}
             >
               <Text style={{ fontWeight: "bold" }}>
-                <FontAwesome5
-                  name={"envelope"}
-                  style={{ color: "#00b815", right: 18 }}
-                  brand
-                />
                 {selectedMarker.type} - {selectedMarker.status}
               </Text>
 
@@ -206,7 +206,17 @@ const MapScreen = () => {
               </Text>
               {selectedMarker.status !=
               AppConstants.MailItemStatus.OutforDelivery ? (
-                <></>
+                <>
+                  <Icon
+                    name={
+                      AppConstants.MailItemIcons[
+                        AppConstants.MappingToDB[selectedMarker.type]
+                      ]
+                    }
+                    size={100}
+                    style={{  marginTop: 10, marginBottom: 10}}
+                  />
+                </>
               ) : (
                 <>
                   <View

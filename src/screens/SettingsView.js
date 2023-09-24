@@ -66,7 +66,7 @@ const SettingsView = () => {
         <Text>Edit Profile Data</Text>
       </TouchableOpacity>
       
-      <TouchableOpacity style={styles.actionItem} onPress={handleLogout}>
+      <TouchableOpacity style={[styles.actionItem, ]} onPress={handleLogout}>
         <Text>Logout</Text>
       </TouchableOpacity>
     </View>
@@ -87,6 +87,7 @@ const styles = StyleSheet.create({
   },
   actionItem: {
     borderBottomWidth: 1,
+    borderTopWidth: 1,
     borderColor: "#ccc",
     padding: 16,
   },
