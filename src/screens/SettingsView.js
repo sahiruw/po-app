@@ -23,7 +23,8 @@ const SettingsView = () => {
 
 
   clearAsyncStorage = async () => {
-    AsyncStorage.removeItem("route");
+    await AsyncStorage.removeItem("route");
+    await AsyncStorage.removeItem("bundleData");
   };
 
   const navigation = useNavigation();
@@ -36,7 +37,7 @@ const SettingsView = () => {
       setUser(null);
       await userService.removeUserData();
       
-
+      await clearAsyncStorage();
       navigation.navigate("Login");
       console.log("User signed out");
     } catch (error) {

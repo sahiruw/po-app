@@ -86,9 +86,10 @@ const MapScreen = () => {
   };
 
   const handleMarkAttempt = (marker) => {
-    if (marker.type != "Normal" || !isMailDelivered) {
-      navigation.navigate("DeliverySubmission", { isMailDelivered, marker });
-    }
+    // if (marker.type != "Normal" || !isMailDelivered) {
+    navigation.navigate("DeliverySubmission", { isMailDelivered, marker });
+    // }
+    // console.log("handleMarkAttempt", marker)
     setSelectedMarker(null);
   };
 
@@ -139,6 +140,7 @@ const MapScreen = () => {
           }}
           zoomControlEnabled={true}
           zoomEnabled={true}
+          showsUserLocation={true}
         >
           {coordinates.length > 0 &&
             coordinates.map((coord, index) => (
@@ -214,7 +216,7 @@ const MapScreen = () => {
                       ]
                     }
                     size={100}
-                    style={{  marginTop: 10, marginBottom: 10}}
+                    style={{ marginTop: 10, marginBottom: 10 }}
                   />
                 </>
               ) : (

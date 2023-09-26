@@ -10,6 +10,7 @@ import { useTheme } from "../../assets/theme/theme";
 import AppbarC from "../../components/AppBarC";
 import { MailListContext } from "../../contextStore/MailListProvider";
 import { AppConstants } from "../../assets/constants";
+import Swipeable from 'react-native-gesture-handler/Swipeable';
 
 const MailListTabs = () => {
   const [mailListToDisplay, setMailListToDisplay] = useState([]);
@@ -27,6 +28,7 @@ const MailListTabs = () => {
           name: mail.receiver_name,
           status: mail.status,
           type: mail.type,
+          mailItem: mail,
         });
       });
       setMailListToDisplay(mailListTemp);
@@ -37,7 +39,13 @@ const MailListTabs = () => {
     return mailListToDisplay.filter((mail) => mail.status === status);
   };
 
-  let today = new Date();
+  const handleMarkAttempt = (item) => {
+    console.log("handleMarkAttempt", item.mailItem);
+    navigation.navigate("DeliverySubmission", { isMailDelivered, marker });
+    // setSelectedMarker(null);
+  };
+
+
   return (
     <>
       <AppbarC title="Mail List" />
@@ -109,7 +117,9 @@ const MailListTabs = () => {
           data={filterMailList(selectedTab)}
           keyExtractor={(item) => item.id.toString()}
           renderItem={({ item }) => (
-            <TouchableOpacity>
+            <TouchableOpacity
+            onPress={() => {handleMarkAttempt(item)}}
+            >
               <View style={styles.mailItem}>
                 <Text>{item.name}</Text>
                 <Text>{String(item.type).toUpperCase()}</Text>

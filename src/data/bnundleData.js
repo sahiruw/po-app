@@ -19,7 +19,7 @@ const getBundleData = async () => {
   let bundleData = JSON.parse(storedBundleData);
 
   if (bundleData?.date === date) {
-    console.log("bundleData from  async");
+    console.log("bundleData from  async", bundleData);
     return bundleData.bundles;
   } else {
     console.log("reading bundleData from firebase");

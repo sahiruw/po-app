@@ -36,7 +36,7 @@ const DeliverySubmission = ({ route, navigation }) => {
   const [selectedMarker, setSelectedMarker] = useState(route.params?.marker);
   const canvasRef = useRef();
   const [note, setNote] = useState("");
-  const [isLoading, setIsLoading] = useState(false)
+  const [isLoading, setIsLoading] = useState(false);
 
   const updateMailList = async (mailID, status) => {
     // console.log(mailList)
@@ -51,29 +51,39 @@ const DeliverySubmission = ({ route, navigation }) => {
   };
 
   const handleSubmit = async () => {
-    setIsLoading(true)
-    let data = {
-      status: AppConstants.MailDeliveryAttemptStatus.Failed,
-      note: note,
-      timestamp: new Date(),
-    };
+    setIsLoading(true);
 
-    if (isMailDelivered) {
-      const imageURI = await canvasRef.current?.toBase64()
-      data = {
-        status: AppConstants.MailDeliveryAttemptStatus.Delivered,
-        sign: imageURI,
+    let res = false;
+    try {
+      let data = {
+        status: AppConstants.MailDeliveryAttemptStatus.Failed,
+        note: note,
         timestamp: new Date(),
       };
+  
+      if (isMailDelivered) {
+        data = {
+          status: AppConstants.MailDeliveryAttemptStatus.Delivered,
+          timestamp: new Date(),
+        };
+  
+        if (selectedMarker.type != AppConstants.MailItems.Normal) {
+          const imageURI = await canvasRef.current?.toBase64();
+          data["sign"] = imageURI
+        }
+      }
+  
+      updateMailList(selectedMarker.id, data.status);
+      res = await mailItemService.updateMailItemdeliveryStatus(
+        selectedMarker,
+        data
+      );
+    }
+    catch (err) {
+      console.log(err);
     }
 
-    updateMailList(selectedMarker.id, data.status);
-    let res = await mailItemService.updateMailItemdeliveryStatus(
-      selectedMarker,
-      data
-    );
-
-    setIsLoading(false)
+    setIsLoading(false);
     if (res) {
       Dialog.show({
         type: ALERT_TYPE.SUCCESS,
@@ -96,13 +106,26 @@ const DeliverySubmission = ({ route, navigation }) => {
     <>
       <AppbarC title="Update Status" showBackButton={true} />
       {/* <Text>{JSON.stringify(hehe)}</Text> */}
-      {isLoading && <LoadingScreen/>}
+      {isLoading && <LoadingScreen />}
       <View style={styles.container}>
-        {isMailDelivered && (
+        {!isMailDelivered ? (
+          <>
+            <Text style={{ padding: 20 }}>
+              Enter a not about the failure of delivery
+            </Text>
+            <TextInput
+              placeholder="Enter note here..."
+              multiline
+              value={note}
+              onChangeText={(text) => setNote(text)}
+              style={styles.inputField}
+            />
+          </>
+        ) : selectedMarker.type != AppConstants.MailItems.Normal ? (
           <>
             <Text style={{ padding: 20 }}>
               {"Ask for signature from " +
-                userUtils.formatName(selectedMarker?.receiver_name)}
+                selectedMarker?.receiver_name}
             </Text>
             <SketchCanvas
               ref={canvasRef}
@@ -156,20 +179,11 @@ const DeliverySubmission = ({ route, navigation }) => {
               </TouchableOpacity>
             </View>
           </>
-        )}
-
-        {!isMailDelivered && (
+        ) : (
           <>
             <Text style={{ padding: 20 }}>
-              Enter a not about the failure of delivery
+              This is a normal mail item. No signature is required.
             </Text>
-            <TextInput
-              placeholder="Enter note here..."
-              multiline
-              value={note}
-              onChangeText={(text) => setNote(text)}
-              style={styles.inputField}
-            />
           </>
         )}
       </View>

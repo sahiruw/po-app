@@ -49,13 +49,13 @@ const getRoute = async (dateKey, uid) => {
       }
 
       let route = { dateKey, uid, mailItemData: mailsForToday };
-      // console.log("route from firebase", route);
+      console.log("route from firebase");
       saveRoute(route);
       return route;
     }
-    console.log("No route document!");
+    console.log("No route Document found");
     return { dateKey, uid, mailItemData: mailsForToday };
-    console.log("Route imported");
+    
   }
 };
 

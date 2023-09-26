@@ -23,7 +23,7 @@ print(doc_ids)
 
 # print(doc_ids)
 new_data = {
-    '9wKkbgqZZPOP6mAioP1ge5zdORe2': random.sample(doc_ids, random.randint(6, len(doc_ids) ))
+    '9wKkbgqZZPOP6mAioP1ge5zdORe2': random.sample(doc_ids, random.randint(6, 10 ))
 }
 print(new_data)
 
