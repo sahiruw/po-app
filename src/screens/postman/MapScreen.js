@@ -49,7 +49,7 @@ const MapScreen = () => {
   };
 
   const fetchCoordinates = async () => {
-    setIsLoading(true);
+    // setIsLoading(true);
 
     if (mailList) {
       // update new mail list in async storage
@@ -66,10 +66,11 @@ const MapScreen = () => {
         });
       }
       // console.log(coordinatesTemp);
+
       setCoordinates(coordinatesTemp);
       console.log("Coordinates fetched from API");
     }
-    setIsLoading(false);
+    // setIsLoading(false);
   };
 
   useEffect(() => {
@@ -77,6 +78,7 @@ const MapScreen = () => {
   }, [mailList]);
 
   useEffect(() => {
+    fetchCoordinates();
     fetchMailList();
   }, []);
 
@@ -95,13 +97,12 @@ const MapScreen = () => {
 
   const handleOpenInMaps = () => {
     console.log("Opening in Google Maps");
-    console.log(coordinates);
     if (coordinates.length > 1) {
       //from last coordinate
       const { latitude, longitude } = coordinates[coordinates.length - 1];
 
       const url = `https://www.google.com/maps/dir/?api=1&destination=${latitude},${longitude}&travelmode = driving&waypoints=${coordinates
-        .slice(1, -2)
+        .slice(0, -2)
         .map((coordinate) => `${coordinate.latitude},${coordinate.longitude}`)
         .join("|")}`;
       console.log("Opening in Google Maps:", url);
@@ -128,7 +129,7 @@ const MapScreen = () => {
         >
           <Text style={styles.buttonText}>Open in Google Maps</Text>
         </TouchableOpacity>
-        {/* <Text>{JSON.stringify(coordinates)}</Text> */}
+        <Text>{JSON.stringify(isLoading)}</Text>
 
         <MapView
           style={styles.map}
@@ -195,7 +196,7 @@ const MapScreen = () => {
               ]}
             >
               <Text style={{ fontWeight: "bold" }}>
-                {selectedMarker.type} - {selectedMarker.status}
+                {String(selectedMarker.type).toUpperCase()} - {selectedMarker.status}
               </Text>
 
               <Text style={{ fontWeight: "bold" }}>

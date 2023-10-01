@@ -20,7 +20,7 @@ address_ids = [doc.id for doc in source_doc_ref]
 
 
 mailitems_ref = db.collection("MailServiceItem")
-start = 195
+start = 50
 for i in range(50):
     mailitem = {
         "receiver_name":  fake.name(),

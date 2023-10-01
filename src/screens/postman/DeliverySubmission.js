@@ -91,6 +91,7 @@ const DeliverySubmission = ({ route, navigation }) => {
         textBody: `Mail item status updated successfully.`,
         button: "Okay",
       });
+      canvasRef.current?.reset()
       navigation.goBack();
     } else {
       Dialog.show({

@@ -16,6 +16,7 @@ import {
 import Constants from "expo-constants";
 
 import ReactNativeAsyncStorage from "@react-native-async-storage/async-storage";
+import { getDatabase } from "firebase/database";
 
 const firebaseConfig = {
   apiKey: Constants.expoConfig.extra.apiKey,
@@ -46,5 +47,6 @@ const app = getApp();
 const auth = getAuth(app);
 const db = getFirestore(app);
 const store = getStorage(app);
+const rtdatabase = getDatabase(app);
 
-export { auth, db, store };
+export { auth, db, store, rtdatabase };

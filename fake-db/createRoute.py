@@ -23,12 +23,12 @@ print(doc_ids)
 
 # print(doc_ids)
 new_data = {
-    '9wKkbgqZZPOP6mAioP1ge5zdORe2': random.sample(doc_ids, random.randint(6, 10 ))
+    'rg-1': random.sample(doc_ids, random.randint(6, 10 ))
 }
 print(new_data)
 
 # Create a new document with a different ID
-new_document_ref = db.collection("Route").document("25092023")
+new_document_ref = db.collection("Route").document("01102023")
 
 # Set the data of the new document with the data from the source document
 new_document_ref.set(new_data)

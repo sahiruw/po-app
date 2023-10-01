@@ -31,10 +31,10 @@ base_locs = {
 }
 
 poIds = {
-    "Galle": "po-3",
-    "Matara": "po-4",
-    "Katubedda": "po-1",
-    "Moratuwa": "po-2",
+    "Galle": "rg-4",
+    "Matara": "rg-5",
+    "Katubedda": "rg-1",
+    "Moratuwa": "rg-2",
 }
 # Define a radius (in meters) around the University to search for random addresses
 radius = 1000  # You can adjust this radius as needed

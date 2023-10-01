@@ -5,7 +5,7 @@ export const AppConstants = {
     "fast-track-courier": "FastTrack",
     "logi post": "Logi",
     "money order": "MoneyOrder",
-    "return": "Return",
+    return: "Return",
   },
 
   MailItems: {
@@ -64,5 +64,10 @@ export const AppConstants = {
   MailDeliveryAttemptStatus: {
     Delivered: "Delivered",
     Failed: "Failed",
+  },
+
+  EmployeeRoles: {
+    Postman: "postman",
+    Dispatcher: "dispatcher",
   },
 };
