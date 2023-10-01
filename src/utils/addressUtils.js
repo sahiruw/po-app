@@ -26,8 +26,7 @@ const getUserLocation = async () => {
     console.log("Permission to access location was denied");
     return;
   }
-
-  let location = await Location.getCurrentPositionAsync({});
+  let location = await Location.getLastKnownPositionAsync({})
   const { latitude, longitude } = location.coords;
   return {
     latitude,

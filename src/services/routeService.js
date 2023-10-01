@@ -10,8 +10,6 @@ const getRouteDataForToday = async () => {
   const user = await userService.getUserData();
 
   let routes = await routeData.getRoute(dateKey, user.region);
-  // console.log(routes)
-  // setMailList(routes.mailItemData);
 
   return routes;
 };

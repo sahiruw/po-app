@@ -6,7 +6,7 @@ import mailItemData from "./mailItemData";
 import addressData from "./addressData";
 import { AppConstants } from "../assets/constants";
 
-const getRoute = async (dateKey, uid) => {
+const getRoute = async (dateKey, regionId) => {
   let routeRaw = await AsyncStorage.getItem("route");
   let routeStored = JSON.parse(routeRaw);
 
@@ -23,7 +23,7 @@ const getRoute = async (dateKey, uid) => {
     const docSnap = await getDoc(docRef);
     if (docSnap.exists()) {
       let docSnapData = docSnap.data();
-      let assignedMails = docSnapData[uid];
+      let assignedMails = docSnapData[regionId];
 
       if (assignedMails) {
         await mailItemData.updateStatusOfMailItems(
@@ -48,14 +48,14 @@ const getRoute = async (dateKey, uid) => {
         }
       }
 
-      let route = { dateKey, uid, mailItemData: mailsForToday };
-      console.log("route from firebase");
+      let route = { dateKey, uid: regionId, mailItemData: mailsForToday };
+      // console.log(route);
+      console.log("route from firebase")
       saveRoute(route);
       return route;
     }
     console.log("No route Document found");
-    return { dateKey, uid, mailItemData: mailsForToday };
-    
+    return { dateKey, uid: regionId, mailItemData: mailsForToday };
   }
 };
 

@@ -54,9 +54,10 @@ const MapScreen = () => {
     if (mailList) {
       // update new mail list in async storage
       await routeService.updateMailListofroute(mailList);
-
       let userloc = await addressUtils.getUserLocation();
+
       let coordinatesTemp = [userloc];
+
       for (let mail of mailList) {
         // console.log(mail.receiver_address_id);
         let location = mail.receiver_address.Location;
@@ -65,7 +66,7 @@ const MapScreen = () => {
           longitude: location[1],
         });
       }
-      // console.log(coordinatesTemp);
+      // console.log(coordinatesTemp)
 
       setCoordinates(coordinatesTemp);
       console.log("Coordinates fetched from API");
@@ -129,7 +130,7 @@ const MapScreen = () => {
         >
           <Text style={styles.buttonText}>Open in Google Maps</Text>
         </TouchableOpacity>
-        <Text>{JSON.stringify(isLoading)}</Text>
+        {/* <Text>{JSON.stringify(coordinates)}</Text> */}
 
         <MapView
           style={styles.map}

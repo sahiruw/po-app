@@ -22,6 +22,7 @@ export default {
         foregroundImage: "./src/assets/app-logo.png",
         backgroundColor: "#ffffff",
       },
+      "package": "com.poapp2.app",
     },
     web: {
       favicon: "./src/assets/app-logo.png",
@@ -34,6 +35,9 @@ export default {
       messagingSenderId: process.env.MESSAGING_SENDER_ID,
       appId: process.env.APP_ID,
       measurementId: process.env.MEASUREMENT_ID,
+      "eas": {
+        "projectId": "c567a7b4-39f4-439e-a31c-1c1db74aa712"
+      }
     },
     gmaps: {
       apiKey: process.env.GMAPS_API_KEY,
