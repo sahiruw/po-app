@@ -42,7 +42,6 @@ const AddAddressScreen = () => {
       let po = await postOfficeService.getDetailsofPostofficeByID(
         postmanActive.postoffice
       );
-
       setAddress({ ...address, City: po.Name, RegionID: postmanActive.region, District: po.District });
       setIsLoading(false);
     };

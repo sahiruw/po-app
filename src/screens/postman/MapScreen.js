@@ -27,7 +27,7 @@ import { MailListContext } from "../../contextStore/MailListProvider";
 import { useContext } from "react";
 import { AppConstants } from "../../assets/constants";
 
-const MAP_API_KEY = Constants.expoConfig.gmaps.apiKey;
+const MAP_API_KEY = Constants.expoConfig.extra.gMapsKey;
 
 const MapScreen = () => {
   const { theme } = useTheme();
@@ -130,7 +130,7 @@ const MapScreen = () => {
         >
           <Text style={styles.buttonText}>Open in Google Maps</Text>
         </TouchableOpacity>
-        {/* <Text>{JSON.stringify(coordinates)}</Text> */}
+        {/* <Text>{JSON.stringify(Constants.expoConfig.extra)}</Text> */}
 
         <MapView
           style={styles.map}
