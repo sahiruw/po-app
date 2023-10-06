@@ -11,12 +11,49 @@ import AppbarC from "../../components/AppBarC";
 import { MailListContext } from "../../contextStore/MailListProvider";
 import { AppConstants } from "../../assets/constants";
 import Swipeable from 'react-native-gesture-handler/Swipeable';
+import { useNavigation } from "@react-navigation/core";
+import EmailDeliveryPopup from "../../components/EmailDeliveryPopup";
+import routeService from "../../services/routeService";
+import LoadingScreen from "../LoadingScreen";
 
 const MailListTabs = () => {
   const [mailListToDisplay, setMailListToDisplay] = useState([]);
   const { mailList, setMailList } = useContext(MailListContext);
   const [selectedTab, setSelectedTab] = useState(AppConstants.MailItemStatus.OutforDelivery);
   var { theme } = useTheme();
+  const navigation = useNavigation();
+  const [isEmailPopupVisible, setEmailPopupVisible] = useState(false);
+  const [selectedMarker, setSelectedMarker] = useState(null);
+  const [isLoading, setIsLoading] = useState(false);
+
+  const fetchMailList = async () => {
+    setIsLoading(true);
+    let route = await routeService.getRouteForToday();
+    setMailList(route.mailItemData);
+    console.log("Mail List fetched from API");
+    setIsLoading(false);
+  };
+
+  useEffect(() => {
+    fetchMailList();
+  }, []);
+
+  const handleYesPress = () => {
+    // Handle "Yes" button press here
+    setEmailPopupVisible(false);
+    navigation.navigate("DeliverySubmission", { isMailDelivered: true, marker: selectedMarker });
+  };
+
+  const handleNoPress = () => {
+    // Handle "No" button press here
+    setEmailPopupVisible(false);
+    navigation.navigate("DeliverySubmission", { isMailDelivered: false, marker: selectedMarker });
+  };
+
+  const handleClosePress = () => {
+    // Handle "Close" button press here
+    setEmailPopupVisible(false);
+  };
 
   useEffect(() => {
     if (mailList) {
@@ -40,14 +77,23 @@ const MailListTabs = () => {
   };
 
   const handleMarkAttempt = (item) => {
-    console.log("handleMarkAttempt", item.mailItem);
-    navigation.navigate("DeliverySubmission", { isMailDelivered, marker });
-    // setSelectedMarker(null);
+    // console.log("handleMarkAttempt", item.mailItem);
+    if (selectedTab === AppConstants.MailItemStatus.OutforDelivery) {
+      setSelectedMarker(item.mailItem);
+      setEmailPopupVisible(true);
+    }
   };
 
 
   return (
     <>
+    {isLoading && <LoadingScreen />}
+    <EmailDeliveryPopup
+        isVisible={isEmailPopupVisible}
+        onYesPress={handleYesPress}
+        onNoPress={handleNoPress}
+        onClosePress={handleClosePress}
+      />
       <AppbarC title="Mail List" />
       <View style={styles.container}>
         <View style={[styles.tabs, { borderColor: theme.primaryColor }]}>
@@ -127,7 +173,9 @@ const MailListTabs = () => {
             </TouchableOpacity>
           )}
         />
+        
       </View>
+      
     </>
   );
 };

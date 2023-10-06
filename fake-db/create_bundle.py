@@ -22,8 +22,8 @@ print(doc_ids)
 # print(doc_ids)
 new_data = {
     'mail_service_items': random.sample(doc_ids, 5),
-    'date': '26092023',
-    'destination_post_office_id': 'po-3',
+    'date': '04102023',
+    'destination_post_office_id': 'po-4',
     'origin_post_office_id': 'po-1',
     'status': 'Queued'
 }

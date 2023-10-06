@@ -16,6 +16,7 @@ import userUtils from "../utils/userUtils";
 
 import {AuthContext} from "../contextStore/AuthProvider";
 import routeService from "../services/routeService";
+import ProfileCard from "../components/ProfileCard";
 
 const SettingsView = () => {
   var { theme } = useTheme();
@@ -49,13 +50,10 @@ const SettingsView = () => {
     <View style={styles.container}>
       <AppBarC title="Settings" />
 
-      {/* User Info Section */}
-      {/* Replace with actual user data */}
-      <View style={styles.userInfo}>
-        <Avatar.Image source={{ uri: user?.profile_picture }} size={100} />
-        <Text>Name: {userUtils.formatName(user?.name)}</Text>
-        <Text>Email: {user?.email}</Text>
-        <Text>Role: {user?.role}</Text>
+
+      <View style={{alignSelf: "center", margin:20}}>
+
+      <ProfileCard />
       </View>
       {/* <Text>{JSON.stringify(user)}</Text> */}
       <TouchableOpacity

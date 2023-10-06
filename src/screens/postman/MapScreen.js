@@ -33,6 +33,7 @@ const MapScreen = () => {
   const { theme } = useTheme();
   const [selectedMarker, setSelectedMarker] = useState(null);
   const [coordinates, setCoordinates] = useState([]);
+  const [coordinatesforRoute, setCoordinatesforRoute] = useState([]);
   const { mailList, setMailList } = useContext(MailListContext);
 
   const [isMailDelivered, setIsMailDelivered] = useState(false);
@@ -57,18 +58,31 @@ const MapScreen = () => {
       let userloc = await addressUtils.getUserLocation();
 
       let coordinatesTemp = [userloc];
+      let coordinatesTempForRoute = [userloc];
+
 
       for (let mail of mailList) {
-        // console.log(mail.receiver_address_id);
+        
         let location = mail.receiver_address.Location;
         coordinatesTemp.push({
           latitude: location[0],
           longitude: location[1],
         });
+
+        if (mail.status === AppConstants.MailItemStatus.OutforDelivery) {
+          // console.log(mail.status);
+          // console.log(mail.receiver_name);
+          
+          coordinatesTempForRoute.push({
+            latitude: location[0],
+            longitude: location[1],
+          });
+        }
       }
       // console.log(coordinatesTemp)
 
       setCoordinates(coordinatesTemp);
+      setCoordinatesforRoute(coordinatesTempForRoute);
       console.log("Coordinates fetched from API");
     }
     // setIsLoading(false);
@@ -81,10 +95,11 @@ const MapScreen = () => {
   useEffect(() => {
     fetchCoordinates();
     fetchMailList();
+
   }, []);
 
   const handleMarkerPress = (index, coord) => {
-    setSelectedMarker({ index, ...mailList[index - 1] });
+    setSelectedMarker({ index, ...mailList[index-1] });
     setIsMailDelivered(false);
   };
 
@@ -98,11 +113,11 @@ const MapScreen = () => {
 
   const handleOpenInMaps = () => {
     console.log("Opening in Google Maps");
-    if (coordinates.length > 1) {
+    if (coordinatesforRoute.length > 1) {
       //from last coordinate
-      const { latitude, longitude } = coordinates[coordinates.length - 1];
+      const { latitude, longitude } = coordinatesforRoute[coordinatesforRoute.length - 1];
 
-      const url = `https://www.google.com/maps/dir/?api=1&destination=${latitude},${longitude}&travelmode = driving&waypoints=${coordinates
+      const url = `https://www.google.com/maps/dir/?api=1&destination=${latitude},${longitude}&travelmode = driving&waypoints=${coordinatesforRoute
         .slice(0, -2)
         .map((coordinate) => `${coordinate.latitude},${coordinate.longitude}`)
         .join("|")}`;
@@ -110,6 +125,7 @@ const MapScreen = () => {
       Linking.openURL(url);
     }
   };
+
 
   const handleOverlayPress = () => {
     // Close the popup when the overlay is pressed
@@ -130,7 +146,8 @@ const MapScreen = () => {
         >
           <Text style={styles.buttonText}>Open in Google Maps</Text>
         </TouchableOpacity>
-        {/* <Text>{JSON.stringify(Constants.expoConfig.extra)}</Text> */}
+        
+        {/* <Text>{JSON.stringify(mailList[0])}</Text> */}
 
         <MapView
           style={styles.map}
@@ -147,9 +164,9 @@ const MapScreen = () => {
           {coordinates.length > 0 &&
             coordinates.map((coord, index) => (
               <Marker
-                key={index}
+                key={index+1}
                 coordinate={coord}
-                title={index == 0 ? "Your Location" : `Item ${index + 1}`}
+                title={index == 0 ? "Your Location" : `Item ${index}`}
                 onPress={() => handleMarkerPress(index, coord)}
                 //colour of the marker
                 pinColor={
@@ -170,11 +187,11 @@ const MapScreen = () => {
 
           {coordinates.length > 1 && (
             <MapViewDirections
-              origin={coordinates[0]}
-              waypoints={coordinates.slice(1, -1)} // Exclude the first and last points
-              destination={coordinates[coordinates.length - 1]}
+              origin={coordinatesforRoute[0]}
+              waypoints={coordinatesforRoute} // Exclude the first and last points
+              destination={coordinatesforRoute[coordinatesforRoute.length - 1]}
               apikey={MAP_API_KEY}
-              strokeWidth={3}
+              strokeWidth={4}
               strokeColor="grey"
             />
           )}
@@ -197,7 +214,8 @@ const MapScreen = () => {
               ]}
             >
               <Text style={{ fontWeight: "bold" }}>
-                {String(selectedMarker.type).toUpperCase()} - {selectedMarker.status}
+                {String(selectedMarker.type).toUpperCase()} -{" "}
+                {selectedMarker.status}
               </Text>
 
               <Text style={{ fontWeight: "bold" }}>
