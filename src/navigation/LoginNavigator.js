@@ -1,6 +1,6 @@
 import React from "react";
 import LoginScreen from "../screens/LoginScreen";
-
+import SettingsView from "../screens/SettingsView";
 import { createBottomTabNavigator } from "@react-navigation/bottom-tabs";
 
 
@@ -17,6 +17,7 @@ function AuthStack() {
         }}
       >
         <Stack.Screen name="Login" component={LoginScreen} />
+        {/* <Stack.Screen name="Settings" component={SettingsView} /> */}
       </Stack.Navigator>
     );
   }

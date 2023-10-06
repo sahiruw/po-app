@@ -1,9 +1,22 @@
-import { initializeApp } from "firebase/app";
-import { getAuth, initializeAuth,getReactNativePersistence, } from "firebase/auth";
-import {getFirestore, initializeFirestore, persistentLocalCache, persistentMultipleTabManager} from "firebase/firestore";
+import { initializeApp, getApps, getApp } from "firebase/app";
+import {
+  getAuth,
+  initializeAuth,
+  getReactNativePersistence,
+} from "firebase/auth";
+import {
+  getFirestore,
+  initializeFirestore,
+  persistentLocalCache,
+} from "firebase/firestore";
+import {
+  getStorage,
+
+} from "firebase/storage";
 import Constants from "expo-constants";
-import { Firestore } from "firebase/firestore";
-import AsyncStorage from "@react-native-async-storage/async-storage";
+
+import ReactNativeAsyncStorage from "@react-native-async-storage/async-storage";
+import { getDatabase } from "firebase/database";
 
 const firebaseConfig = {
   apiKey: Constants.expoConfig.extra.apiKey,
@@ -12,12 +25,28 @@ const firebaseConfig = {
   storageBucket: Constants.expoConfig.extra.storageBucket,
   messagingSenderId: Constants.expoConfig.extra.messagingSenderId,
   appId: Constants.expoConfig.extra.appId,
-  measurementId: Constants.expoConfig.extra.measurementId
+  measurementId: Constants.expoConfig.extra.measurementId,
 };
 
 // Initialize Firebase
-const app = initializeApp(firebaseConfig);
-const auth = getAuth(app);
-const db = getFirestore(app)
+if (!getApps().length) {
+  console.log("Initializing Firebase");
+  const app = initializeApp(firebaseConfig);
+  console.log("Initializing Auth");
+  initializeAuth(app, {
+    persistence: getReactNativePersistence(ReactNativeAsyncStorage),
+  });
+  console.log("Initializing Firestore");
+  initializeFirestore(app, {
+    persistence: persistentLocalCache,
+  });
+  console.log("Firebase Initialized");
+}
 
-export { auth, db}
+const app = getApp();
+const auth = getAuth(app);
+const db = getFirestore(app);
+const store = getStorage(app);
+const rtdatabase = getDatabase(app);
+
+export { auth, db, store, rtdatabase };

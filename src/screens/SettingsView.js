@@ -1,5 +1,5 @@
 // screens/SettingsScreen.js
-import React, { useEffect, useState } from "react";
+import React, { useContext, useEffect, useState } from "react";
 import { View, Text, TouchableOpacity, StyleSheet } from "react-native";
 import { Avatar } from "react-native-paper";
 import AppBarC from "../components/AppBarC";
@@ -14,27 +14,19 @@ import { useNavigation } from "@react-navigation/core";
 import userService from "../services/userService";
 import userUtils from "../utils/userUtils";
 
+import {AuthContext} from "../contextStore/AuthProvider";
+import routeService from "../services/routeService";
+import ProfileCard from "../components/ProfileCard";
+
 const SettingsView = () => {
   var { theme } = useTheme();
-  const [user, setUser] = useState(null);
+  const {user, setUser} = useContext(AuthContext);
 
-  clearAsyncStorage = async() => {
-    AsyncStorage.removeItem("route");
-}
 
-  useEffect(() => {
-    const getUserData = async () => {
-      try {
-        const jsonValue = await AsyncStorage.getItem("user");
-        if (jsonValue != null) {
-          setUser(JSON.parse(jsonValue));
-        }
-      } catch (e) {
-        console.log(e);
-      }
-    };
-    getUserData();
-  }, []);
+  clearAsyncStorage = async () => {
+    await AsyncStorage.removeItem("route");
+    await AsyncStorage.removeItem("bundleData");
+  };
 
   const navigation = useNavigation();
 
@@ -42,10 +34,11 @@ const SettingsView = () => {
     try {
       await signOut(auth);
       // await AsyncStorage.removeItem("user");
+      await routeService.removeRoute();
+      setUser(null);
       await userService.removeUserData();
-      setTimeout(() => {
-        console.log("Waited 1 second");
-      }, 1000);
+      
+      await clearAsyncStorage();
       navigation.navigate("Login");
       console.log("User signed out");
     } catch (error) {
@@ -57,27 +50,22 @@ const SettingsView = () => {
     <View style={styles.container}>
       <AppBarC title="Settings" />
 
-      {/* User Info Section */}
-      {/* Replace with actual user data */}
-      <View style={styles.userInfo}>
-        <Avatar.Image source={require("./profile.jpg")} size={100} />
-        <Text>Name: {userUtils.formatName(user?.name)}</Text>
-        <Text>Email: {user?.email}</Text>
-        <Text>Role: {user?.role}</Text>
+
+      <View style={{alignSelf: "center", margin:20}}>
+
+      <ProfileCard />
       </View>
+      {/* <Text>{JSON.stringify(user)}</Text> */}
       <TouchableOpacity
         style={styles.actionItem}
-        onPress={() => navigation.navigate("EditProfile")}
+        onPress={() => {
+          navigation.navigate("EditProfile");
+        }}
       >
         <Text>Edit Profile Data</Text>
       </TouchableOpacity>
-      <TouchableOpacity style={styles.actionItem}>
-        <Text>Show Statistics</Text>
-      </TouchableOpacity>
-      <TouchableOpacity style={styles.actionItem} onPress={clearAsyncStorage }>
-        <Text>Clear Cache</Text>
-      </TouchableOpacity>
-      <TouchableOpacity style={styles.actionItem} onPress={handleLogout}>
+      
+      <TouchableOpacity style={[styles.actionItem, ]} onPress={handleLogout}>
         <Text>Logout</Text>
       </TouchableOpacity>
     </View>
@@ -98,6 +86,7 @@ const styles = StyleSheet.create({
   },
   actionItem: {
     borderBottomWidth: 1,
+    borderTopWidth: 1,
     borderColor: "#ccc",
     padding: 16,
   },

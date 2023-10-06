@@ -11,26 +11,25 @@ db = firestore.client()
 
 
 # Reference to the source document
-# source_doc_ref = db.collection("MailServiceItem").list_documents()
-# doc_ids = [doc.id for doc in source_doc_ref]
+query = db.collection("MailServiceItem").where("status", "==", "To be Dispatched")
 
-query = db.collection("MailServiceItem").where("status", "==", "To be Delivered").stream()
+# Get the documents that match the query
+docs = query.stream()
 
-# Get the document IDs of the matching documents
-doc_ids = [doc.id for doc in query]
+doc_ids = [doc.id for doc in docs]
 
 print(doc_ids)
-
 # print(doc_ids)
 new_data = {
-    'rg-1': random.sample(doc_ids, random.randint(6, 10 ))
+    'mail_service_items': random.sample(doc_ids, 5),
+    'date': '04102023',
+    'destination_post_office_id': 'po-4',
+    'origin_post_office_id': 'po-1',
+    'status': 'Queued'
 }
-print(new_data)
 
 # Create a new document with a different ID
-new_document_ref = db.collection("Route").document("06102023")
+new_document_ref = db.collection("Bundle")
 
 # Set the data of the new document with the data from the source document
-new_document_ref.set(new_data)
-
-print("Document duplicated successfully")
+new_document_ref.add(new_data)

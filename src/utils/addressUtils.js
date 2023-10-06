@@ -2,7 +2,7 @@ import * as Location from "expo-location";
 import Constants from "expo-constants";
 import Geocoder from 'react-native-geocoding';
 
-Geocoder.init(Constants.expoConfig.gmaps.apiKey);
+Geocoder.init(Constants.expoConfig.extra.gMapsKey);
 
 const formatAddress = (address) => {
   return `${address.HouseNo}, ${address.Address_line_1}, ${address.Address_line_2}, ${address.Address_line_3}, ${address.City}`;
@@ -26,8 +26,7 @@ const getUserLocation = async () => {
     console.log("Permission to access location was denied");
     return;
   }
-
-  let location = await Location.getCurrentPositionAsync({});
+  let location = await Location.getLastKnownPositionAsync({})
   const { latitude, longitude } = location.coords;
   return {
     latitude,

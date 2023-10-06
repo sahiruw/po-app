@@ -4,24 +4,13 @@ import { useTheme } from "../../assets/theme/theme";
 import userService from "../../services/userService";
 import routeService from "../../services/routeService";
 import AppBarC from "../../components/AppBarC";
-import mailItemService from "../../services/mailItemService";
+import { useContext } from "react";
+import { AuthContext } from "../../contextStore/AuthProvider";
+
 
 const HomeScreen = ({ navigation }) => {
   var { theme } = useTheme();
-  const [user, setUser] = useState(null);
-
-  useEffect(() => {
-    async function getUser() {
-      let user = await userService.getUserData();
-      setUser(user);
-    }
-    async function getMailData() {
-      let mail = await mailItemService.getDetailsofMailItemByID("0Op2tD2zDfe3mfVxf2SF")
-      console.log(mail);
-    }
-    getUser();
-    getMailData();
-  }, []);
+  const {user, setUser} = useContext(AuthContext)
 
   return (
     <>

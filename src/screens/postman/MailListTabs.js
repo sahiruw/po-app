@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useContext, useEffect, useState } from "react";
 import {
   View,
   Text,
@@ -8,86 +8,174 @@ import {
 } from "react-native";
 import { useTheme } from "../../assets/theme/theme";
 import AppbarC from "../../components/AppBarC";
+import { MailListContext } from "../../contextStore/MailListProvider";
+import { AppConstants } from "../../assets/constants";
+import Swipeable from 'react-native-gesture-handler/Swipeable';
+import { useNavigation } from "@react-navigation/core";
+import EmailDeliveryPopup from "../../components/EmailDeliveryPopup";
+import routeService from "../../services/routeService";
+import LoadingScreen from "../LoadingScreen";
 
 const MailListTabs = () => {
-  const mailList = [
-    { id: 1, name: "Mail 1", status: "In progress" },
-    { id: 2, name: "Mail 2", status: "Delivered" },
-    { id: 3, name: "Mail 3", status: "Delivery Failed" },
-    { id: 4, name: "Mail 4", status: "In progress" },
-    { id: 5, name: "Mail 5", status: "Delivered" },
-    { id: 6, name: "Mail 6", status: "Delivery Failed" },
-  ];
-
-  const [selectedTab, setSelectedTab] = useState("In progress");
-
+  const [mailListToDisplay, setMailListToDisplay] = useState([]);
+  const { mailList, setMailList } = useContext(MailListContext);
+  const [selectedTab, setSelectedTab] = useState(AppConstants.MailItemStatus.OutforDelivery);
   var { theme } = useTheme();
+  const navigation = useNavigation();
+  const [isEmailPopupVisible, setEmailPopupVisible] = useState(false);
+  const [selectedMarker, setSelectedMarker] = useState(null);
+  const [isLoading, setIsLoading] = useState(false);
 
-  const filterMailList = (status) => {
-    return mailList.filter((mail) => mail.status === status);
+  const fetchMailList = async () => {
+    setIsLoading(true);
+    let route = await routeService.getRouteForToday();
+    setMailList(route.mailItemData);
+    console.log("Mail List fetched from API");
+    setIsLoading(false);
   };
 
-  let today = new Date();
+  useEffect(() => {
+    fetchMailList();
+  }, []);
+
+  const handleYesPress = () => {
+    // Handle "Yes" button press here
+    setEmailPopupVisible(false);
+    navigation.navigate("DeliverySubmission", { isMailDelivered: true, marker: selectedMarker });
+  };
+
+  const handleNoPress = () => {
+    // Handle "No" button press here
+    setEmailPopupVisible(false);
+    navigation.navigate("DeliverySubmission", { isMailDelivered: false, marker: selectedMarker });
+  };
+
+  const handleClosePress = () => {
+    // Handle "Close" button press here
+    setEmailPopupVisible(false);
+  };
+
+  useEffect(() => {
+    if (mailList) {
+      let mailListTemp = [];
+
+      mailList.forEach((mail) => {
+        mailListTemp.push({
+          id: mail.id,
+          name: mail.receiver_name,
+          status: mail.status,
+          type: mail.type,
+          mailItem: mail,
+        });
+      });
+      setMailListToDisplay(mailListTemp);
+    }
+  }, [mailList]);
+
+  const filterMailList = (status) => {
+    return mailListToDisplay.filter((mail) => mail.status === status);
+  };
+
+  const handleMarkAttempt = (item) => {
+    // console.log("handleMarkAttempt", item.mailItem);
+    if (selectedTab === AppConstants.MailItemStatus.OutforDelivery) {
+      setSelectedMarker(item.mailItem);
+      setEmailPopupVisible(true);
+    }
+  };
+
+
   return (
     <>
+    {isLoading && <LoadingScreen />}
+    <EmailDeliveryPopup
+        isVisible={isEmailPopupVisible}
+        onYesPress={handleYesPress}
+        onNoPress={handleNoPress}
+        onClosePress={handleClosePress}
+      />
       <AppbarC title="Mail List" />
       <View style={styles.container}>
         <View style={[styles.tabs, { borderColor: theme.primaryColor }]}>
           <TouchableOpacity
             style={[
               styles.tab,
-              selectedTab === "In progress"
+              selectedTab === AppConstants.MailItemStatus.OutforDelivery
                 ? { backgroundColor: theme.primaryColor }
                 : { backgroundColor: "#f0f0f0" },
             ]}
-            onPress={() => setSelectedTab("In progress")}
+            onPress={() =>
+              setSelectedTab(AppConstants.MailItemStatus.OutforDelivery)
+            }
           >
-            <Text style={selectedTab === "In progress"
-                ? {color: theme.backgroundColor}
-                : {}}>In progress</Text>
+            <Text
+              style={
+                selectedTab === AppConstants.MailItemStatus.OutforDelivery
+                  ? { color: theme.backgroundColor }
+                  : {}
+              }
+            >
+              In progress
+            </Text>
           </TouchableOpacity>
           <TouchableOpacity
             style={[
               styles.tab,
-              selectedTab === "Delivered"
+              selectedTab === AppConstants.MailItemStatus.Delivered
                 ? { backgroundColor: theme.primaryColor }
                 : { backgroundColor: "#f0f0f0" },
             ]}
-            onPress={() => setSelectedTab("Delivered")}
+            onPress={() =>
+              setSelectedTab(AppConstants.MailItemStatus.Delivered)
+            }
           >
-            <Text style={selectedTab === "Delivered"
-                ? {color: theme.backgroundColor}
-                : {}}>Delivered</Text>
+            <Text
+              style={
+                selectedTab === AppConstants.MailItemStatus.Delivered
+                  ? { color: theme.backgroundColor }
+                  : {}
+              }
+            >
+              Delivered
+            </Text>
           </TouchableOpacity>
           <TouchableOpacity
             style={[
               styles.tab,
-              selectedTab === "Delivery Failed"
+              selectedTab === AppConstants.MailItemStatus.Failed
                 ? { backgroundColor: theme.primaryColor }
                 : { backgroundColor: "#f0f0f0" },
             ]}
-            onPress={() => setSelectedTab("Delivery Failed")}
+            onPress={() => setSelectedTab(AppConstants.MailItemStatus.Failed)}
           >
-  
-
-            <Text style={selectedTab === "Delivery Failed"
-                ? {color: theme.backgroundColor}
-                : {}}>Delivery Failed</Text>
+            <Text
+              style={
+                selectedTab === AppConstants.MailItemStatus.Failed
+                  ? { color: theme.backgroundColor }
+                  : {}
+              }
+            >
+              Delivery Failed
+            </Text>
           </TouchableOpacity>
         </View>
         <FlatList
           data={filterMailList(selectedTab)}
           keyExtractor={(item) => item.id.toString()}
           renderItem={({ item }) => (
-            <TouchableOpacity>
+            <TouchableOpacity
+            onPress={() => {handleMarkAttempt(item)}}
+            >
               <View style={styles.mailItem}>
                 <Text>{item.name}</Text>
-                <Text>{today.toLocaleString()}</Text>
+                <Text>{String(item.type).toUpperCase()}</Text>
               </View>
             </TouchableOpacity>
           )}
         />
+        
       </View>
+      
     </>
   );
 };

@@ -11,7 +11,7 @@ import SettingsView from "../screens/SettingsView";
 import AddtoBundleScreen from "../screens/dispatcher/AddtoBundleScreen";
 // import create
 import { createBottomTabNavigator } from "@react-navigation/bottom-tabs";
-
+import ScanArrivedBundle from "../screens/dispatcher/ScanArrivedBundle";
 import Icon from "react-native-vector-icons/MaterialCommunityIcons";
 import { useTheme } from "../assets/theme/theme";
 
@@ -69,10 +69,10 @@ function MainStack() {
       />
 
       <StackBottom.Screen
-        name="View Bundles"
-        component={AddtoBundleScreen}
+        name="Scan Bundle"
+        component={ScanArrivedBundle}
         options={{
-          tabBarLabel: "View Bundles",
+          tabBarLabel: "Scan Bundle",
           tabBarIcon: ({ color, size }) => {
             return <Icon name="package-variant-closed" size={size} color={color} />;
           },

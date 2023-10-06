@@ -6,10 +6,10 @@ export default {
     slug: "po-app2",
     version: "1.0.0",
     orientation: "portrait",
-    icon: "./src/assets/icon.png",
+    icon: "./src/assets/logo.png",
     userInterfaceStyle: "light",
     splash: {
-      image: "./src/assets/splash.png",
+      image: "./src/assets/logo.png",
       resizeMode: "contain",
       backgroundColor: "#ffffff",
     },
@@ -19,12 +19,13 @@ export default {
     },
     android: {
       adaptiveIcon: {
-        foregroundImage: "./src/assets/adaptive-icon.png",
+        foregroundImage: "./src/assets/app-logo.png",
         backgroundColor: "#ffffff",
       },
+      "package": "com.poapp2.app",
     },
     web: {
-      favicon: "./src/assets/favicon.png",
+      favicon: "./src/assets/app-logo.png",
     },
     extra: {
       apiKey: process.env.API_KEY,
@@ -34,9 +35,10 @@ export default {
       messagingSenderId: process.env.MESSAGING_SENDER_ID,
       appId: process.env.APP_ID,
       measurementId: process.env.MEASUREMENT_ID,
-    },
-    gmaps: {
-      apiKey: process.env.GMAPS_API_KEY,
-    },
+      gMapsKey: process.env.GMAPS_API_KEY,
+      "eas": {
+        "projectId": "c567a7b4-39f4-439e-a31c-1c1db74aa712"
+      }
+    }
   },
 };
