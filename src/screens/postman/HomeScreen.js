@@ -9,25 +9,14 @@ import DeliveryStatusCard from "../../components/DeliveryStatusCard";
 import ClockComponent from "../../components/ClockComponent";
 
 const HomeScreen = () => {
-  const [date, setDate] = useState(new Date());
   const { user, setUser } = useContext(AuthContext);
-  useEffect(() => {
-    const timer = setInterval(() => {
-      setDate(new Date());
-    }, 1000);
-    return () => clearInterval(timer);
-  }, []);
 
   return (
     <>
       <AppbarC title="Home" />
       <View style={styles.container}>
-        {/* <View style={styles.dateContainer}>
-          <Text style={styles.dateText}>{date.toLocaleTimeString()}</Text>
-          <Text style={styles.dateText}>{date.toLocaleDateString()}</Text>
-        </View> */}
         <ClockComponent />
-        <ProfileCard />
+        <ProfileCard /> 
         <DeliveryStatusCard />
       </View>
     </>
