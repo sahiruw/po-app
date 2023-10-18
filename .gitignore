@@ -2,6 +2,8 @@
 
 # dependencies
 node_modules/
+fake-db/
+test/
 
 # Expo
 .expo/
@@ -29,6 +31,8 @@ yarn-error.*
 # macOS
 .DS_Store
 *.pem
+
+.env
 
 # local env files
 .env*.local

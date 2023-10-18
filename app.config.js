@@ -36,6 +36,7 @@ export default {
       appId: process.env.APP_ID,
       measurementId: process.env.MEASUREMENT_ID,
       gMapsKey: process.env.GMAPS_API_KEY,
+      weatherKey: process.env.WEATHER_API_KEY,
       "eas": {
         "projectId": "c567a7b4-39f4-439e-a31c-1c1db74aa712"
       }
