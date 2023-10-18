@@ -3,6 +3,7 @@
 # dependencies
 node_modules/
 fake-db/
+test/
 
 # Expo
 .expo/
