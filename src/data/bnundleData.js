@@ -18,13 +18,14 @@ const getBundleData = async () => {
   let storedBundleData = await AsyncStorage.getItem("bundleData");
   let bundleData = JSON.parse(storedBundleData);
 
-  if (bundleData?.date === date) {
+  if (bundleData?.date === date && false) {
     console.log("bundleData from  async", bundleData);
     return bundleData.bundles;
   } else {
     console.log("reading bundleData from firebase");
-
+    
     const q = query(
+
       collection(db, "Bundle"),
       where("date", "==", date),
       where("status", "==", "Queued")
@@ -35,7 +36,7 @@ const getBundleData = async () => {
     await getDocs(q)
       .then((querySnapshot) => {
         querySnapshot.forEach((doc) => {
-          // console.log(doc.id, " => ", doc.data());
+          console.log(doc.id, " => ", doc.data());
           bundles.push({ id: doc.id, ...doc.data() });
         });
       })

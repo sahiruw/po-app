@@ -27,6 +27,7 @@ const HomeScreen = () => {
           <Text style={styles.dateText}>{date.toLocaleDateString()}</Text>
         </View> */}
         <ClockComponent />
+
         <ProfileCard />
         <DeliveryStatusCard />
       </View>

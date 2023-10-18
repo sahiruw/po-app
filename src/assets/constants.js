@@ -46,6 +46,7 @@ export const AppConstants = {
     Failed: "Failed",
     Dispatched: "Dispatched",
     Neglected: "Neglected",
+    Assigned: "assigned",
   },
 
   MailItemIcons: {

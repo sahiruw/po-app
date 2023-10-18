@@ -70,6 +70,7 @@ function RootNavigator() {
     return () => unsubscribe();
   }, []);
 
+  
   const saveLocationToFirebase = async (lat, long) => {
 
     const userId = user?.uid;
@@ -85,6 +86,7 @@ function RootNavigator() {
       console.error("Error saving location to Firebase:", error);
     }
   };
+
 
 
 
@@ -106,7 +108,7 @@ function RootNavigator() {
     };
 
     if (user?.role == AppConstants.EmployeeRoles.Postman) {
-      getLocationPermission();
+       getLocationPermission();
     }
   }, []);
 

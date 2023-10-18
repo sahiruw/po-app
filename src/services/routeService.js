@@ -8,8 +8,8 @@ const getRouteDataForToday = async () => {
   let dateKey = dateUtils.getToday();
 
   const user = await userService.getUserData();
-
-  let routes = await routeData.getRoute(dateKey, user.region);
+  // console.log(user)
+  let routes = await routeData.getRoute(dateKey, user.uid);
 
   return routes;
 };
