@@ -25,7 +25,7 @@ const ScanArrived = ({ navigation }) => {
   const [scannedBarcode, setScannedBarcode] = useState(true);
   const [scannedValue, setScannedValue] = useState(null);
   const [loading, setLoading] = useState(false);
-
+  const [submitted, setSubmitted] = useState(false);
   useEffect(() => {
     const retrieveUser = async () => {
       let user = await userService.getActiveUserData();
@@ -35,14 +35,16 @@ const ScanArrived = ({ navigation }) => {
   }, []);
 
   const handleBarCodeScanned = async ({ type, data }) => {
+    setSubmitted(false);
     setScannedBarcode(true);
 
     const retrieveBundle = async () => {
       setLoading(true);
       let bundleData = await bundleService.getBundleDataByID(data);
-      console.log(bundleData.destination_post_office_id == user.postoffice)
+      // console.log(bundleData);
+      // console.log(bundleData.destination_post_office_id == user.postoffice)
       let isValidBundle =
-        bundleData.destination_post_office_id == user.postoffice;
+        bundleData?.destination_post_office_id == user.postoffice;
 
       if (isValidBundle) {
         let fromPO = await postOfficeService.getDetailsofPostofficeByID(
@@ -67,8 +69,7 @@ const ScanArrived = ({ navigation }) => {
         textBody: `The bundle ${data} is not valid for this post office.`,
         button: "Okay",
       });
-    }
-    else {
+    } else {
       Toast.show({
         type: ALERT_TYPE.SUCCESS,
         title: "Successfull",
@@ -80,6 +81,7 @@ const ScanArrived = ({ navigation }) => {
 
   const handleSubmit = async () => {
     setLoading(true);
+    
     let bundleData = scannedValue;
 
     // setScannedValue(null);
@@ -91,6 +93,7 @@ const ScanArrived = ({ navigation }) => {
       button: "Okay",
     });
     setLoading(false);
+    setSubmitted(true);
   };
 
   return (
@@ -188,35 +191,43 @@ const ScanArrived = ({ navigation }) => {
               {"\n\n"}
               No of MailItems: {scannedValue.mail_service_items.length}
             </Text>
-            <TouchableOpacity
-              style={[
-                styles.button,
-                {
-                  backgroundColor: theme.lightBackgroundColor3,
-                  width: 200,
-                  alignSelf: "center",
-                },
-              ]}
-              onPress={handleSubmit}
-            >
-              <Text style={styles.buttonText}>Mark as arrived</Text>
-            </TouchableOpacity>
-            <TouchableOpacity
-              style={[
-                styles.button,
-                {
-                  backgroundColor: theme.lightBackgroundColor3,
-                  width: 200,
-                  alignSelf: "center",
-                },
-              ]}
-              onPress={() => {
-                setScannedValue(null);
-              }}
-            >
-              <Text style={styles.buttonText}>Cancel</Text>
-            </TouchableOpacity>
-            {/* <Text>{JSON.stringify(scannedValue)}</Text> */}
+            {!submitted && (
+              <>
+                <TouchableOpacity
+                  style={[
+                    styles.button,
+                    {
+                      backgroundColor: theme.lightBackgroundColor3,
+                      width: 200,
+                      alignSelf: "center",
+                    },
+                  ]}
+                  onPress={handleSubmit}
+                >
+                  <Text style={styles.buttonText}>Mark as arrived</Text>
+                </TouchableOpacity>
+                <TouchableOpacity
+                  style={[
+                    styles.button,
+                    {
+                      backgroundColor: theme.lightBackgroundColor3,
+                      width: 200,
+                      alignSelf: "center",
+                    },
+                  ]}
+                  onPress={() => {
+                    setScannedValue(null);
+                  }}
+                >
+                  <Text style={styles.buttonText}>Cancel</Text>
+                </TouchableOpacity>
+              </>
+            )}
+            {submitted && (
+              <Text style={{ fontSize: 16, textAlign: "center" }}>
+                You have marked the bundle as arrived.
+              </Text>
+            )}
           </View>
         ) : null}
       </View>

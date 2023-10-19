@@ -26,8 +26,12 @@ import { useTheme } from "../../assets/theme/theme";
 import { MailListContext } from "../../contextStore/MailListProvider";
 import { useContext } from "react";
 import { AppConstants } from "../../assets/constants";
+import { ALERT_TYPE, Dialog, Toast } from "react-native-alert-notification";
 
-const MAP_API_KEY = Constants.expoConfig.extra.gMapsKey;
+import { PROVIDER_GOOGLE } from "react-native-maps";
+
+const MAP_API_KEY = Constants.expoConfig.extra.apiKey;
+console.log("map api",MAP_API_KEY);
 
 const MapScreen = () => {
   const { theme } = useTheme();
@@ -60,9 +64,7 @@ const MapScreen = () => {
       let coordinatesTemp = [userloc];
       let coordinatesTempForRoute = [userloc];
 
-
       for (let mail of mailList) {
-        
         let location = mail.receiver_address.Location;
         coordinatesTemp.push({
           latitude: location[0],
@@ -72,7 +74,7 @@ const MapScreen = () => {
         if (mail.status === AppConstants.MailItemStatus.OutforDelivery) {
           // console.log(mail.status);
           // console.log(mail.receiver_name);
-          
+
           coordinatesTempForRoute.push({
             latitude: location[0],
             longitude: location[1],
@@ -95,11 +97,15 @@ const MapScreen = () => {
   useEffect(() => {
     fetchCoordinates();
     fetchMailList();
-
   }, []);
 
+  const reload = async () => {
+    fetchCoordinates();
+    fetchMailList();
+  };
+
   const handleMarkerPress = (index, coord) => {
-    setSelectedMarker({ index, ...mailList[index-1] });
+    setSelectedMarker({ index, ...mailList[index - 1] });
     setIsMailDelivered(false);
   };
 
@@ -112,10 +118,11 @@ const MapScreen = () => {
   };
 
   const handleOpenInMaps = () => {
-    console.log("Opening in Google Maps");
+    
     if (coordinatesforRoute.length > 1) {
-      //from last coordinate
-      const { latitude, longitude } = coordinatesforRoute[coordinatesforRoute.length - 1];
+      console.log("Opening in Google Maps");
+      const { latitude, longitude } =
+        coordinatesforRoute[coordinatesforRoute.length - 1];
 
       const url = `https://www.google.com/maps/dir/?api=1&destination=${latitude},${longitude}&travelmode = driving&waypoints=${coordinatesforRoute
         .slice(0, -2)
@@ -124,8 +131,16 @@ const MapScreen = () => {
       console.log("Opening in Google Maps:", url);
       Linking.openURL(url);
     }
+    else {
+      console.log("No route to open in Google Maps");
+      Dialog.show({
+        type: ALERT_TYPE.WARNING,
+        title: "Unsuccessful",
+        textBody: "No route to open in Google Maps",
+        button: "Okay",
+      });
+    }
   };
-
 
   const handleOverlayPress = () => {
     // Close the popup when the overlay is pressed
@@ -137,19 +152,31 @@ const MapScreen = () => {
       <AppbarC title="Map" />
       {isLoading && <LoadingScreen />}
       <View style={styles.container}>
-        <TouchableOpacity
-          style={[
-            styles.button,
-            { backgroundColor: theme.midGreenBackgroundColor },
-          ]}
-          onPress={handleOpenInMaps}
-        >
-          <Text style={styles.buttonText}>Open in Google Maps</Text>
-        </TouchableOpacity>
-        
+        <View style={styles.container2}>
+          <TouchableOpacity
+            style={[
+              styles.button,
+              { backgroundColor: theme.midGreenBackgroundColor, width: "85%" },
+            ]}
+            onPress={handleOpenInMaps}
+          >
+            <Text style={styles.buttonText}>Open in Google Maps</Text>
+          </TouchableOpacity>
+          <TouchableOpacity
+            style={[
+              styles.button,
+              { backgroundColor: theme.midRedBackgroundColor, width: "10%" , padding: 5},
+            ]}
+            onPress={reload}
+          >
+            <Text style={[styles.buttonText, {fontSize: 20}]}>↻</Text>
+          </TouchableOpacity>
+        </View>
+
         {/* <Text>{JSON.stringify(mailList[0])}</Text> */}
 
         <MapView
+          
           style={styles.map}
           initialRegion={{
             latitude: coordinates[0] ? coordinates[0].latitude : 6.79,
@@ -160,11 +187,12 @@ const MapScreen = () => {
           zoomControlEnabled={true}
           zoomEnabled={true}
           showsUserLocation={true}
+          provider = {PROVIDER_GOOGLE}
         >
           {coordinates.length > 0 &&
             coordinates.map((coord, index) => (
               <Marker
-                key={index+1}
+                key={index + 1}
                 coordinate={coord}
                 title={index == 0 ? "Your Location" : `Item ${index}`}
                 onPress={() => handleMarkerPress(index, coord)}
@@ -347,8 +375,8 @@ const styles = StyleSheet.create({
   container2: {
     flexDirection: "row", // Arrange buttons horizontally
     justifyContent: "space-between", // Space between buttons
-    paddingHorizontal: 20, // Add horizontal padding for spacing
-    paddingVertical: 20,
+    // paddingHorizontal: 20, // Add horizontal padding for spacing
+    // paddingVertical: 20,
   },
 });
 

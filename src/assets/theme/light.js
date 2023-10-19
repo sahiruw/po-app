@@ -12,6 +12,7 @@ const lightTheme = {
   lightRedBackgroundColor: '#ffe6e6', // Light red background
 
   midGreenBackgroundColor: '#165c49', // Mid green background
+  midRedBackgroundColor: '#941e1e', // Mid red background
 
   // Accent colors
   accentColor: '#FF4500', // Deep red accent color

@@ -14,14 +14,19 @@ import { useNavigation } from "@react-navigation/core";
 import userService from "../services/userService";
 import userUtils from "../utils/userUtils";
 
-import {AuthContext} from "../contextStore/AuthProvider";
+import { AuthContext } from "../contextStore/AuthProvider";
 import routeService from "../services/routeService";
 import ProfileCard from "../components/ProfileCard";
 
+import * as Location from "expo-location";
+import * as Permissions from "expo-permissions";
+import * as TaskManager from "expo-task-manager";
+
+LOCATION_TRACKING = "background-location-task";
+
 const SettingsView = () => {
   var { theme } = useTheme();
-  const {user, setUser} = useContext(AuthContext);
-
+  const { user, setUser } = useContext(AuthContext);
 
   clearAsyncStorage = async () => {
     await AsyncStorage.removeItem("route");
@@ -32,12 +37,18 @@ const SettingsView = () => {
 
   const handleLogout = async () => {
     try {
+      TaskManager.isTaskRegisteredAsync(LOCATION_TRACKING).then((tracking) => {
+        if (tracking) {
+          Location.stopLocationUpdatesAsync(LOCATION_TRACKING);
+        }
+      });
+
       await signOut(auth);
       // await AsyncStorage.removeItem("user");
       await routeService.removeRoute();
       setUser(null);
       await userService.removeUserData();
-      
+
       await clearAsyncStorage();
       navigation.navigate("Login");
       console.log("User signed out");
@@ -50,10 +61,8 @@ const SettingsView = () => {
     <View style={styles.container}>
       <AppBarC title="Settings" />
 
-
-      <View style={{alignSelf: "center", margin:20}}>
-
-      <ProfileCard />
+      <View style={{ alignSelf: "center", margin: 20 }}>
+        <ProfileCard />
       </View>
       {/* <Text>{JSON.stringify(user)}</Text> */}
       <TouchableOpacity
@@ -64,8 +73,8 @@ const SettingsView = () => {
       >
         <Text>Edit Profile Data</Text>
       </TouchableOpacity>
-      
-      <TouchableOpacity style={[styles.actionItem, ]} onPress={handleLogout}>
+
+      <TouchableOpacity style={[styles.actionItem]} onPress={handleLogout}>
         <Text>Logout</Text>
       </TouchableOpacity>
     </View>

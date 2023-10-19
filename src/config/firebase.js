@@ -18,7 +18,7 @@ import Constants from "expo-constants";
 import ReactNativeAsyncStorage from "@react-native-async-storage/async-storage";
 import { getDatabase } from "firebase/database";
 
-const firebaseConfig = {
+let firebaseConfig = {
   apiKey: Constants.expoConfig.extra.apiKey,
   authDomain: Constants.expoConfig.extra.authDomain,
   projectId: Constants.expoConfig.extra.projectId,
@@ -28,8 +28,11 @@ const firebaseConfig = {
   measurementId: Constants.expoConfig.extra.measurementId,
 };
 
+console.log(JSON.stringify(firebaseConfig));
+
 // Initialize Firebase
 if (!getApps().length) {
+  
   console.log("Initializing Firebase");
   const app = initializeApp(firebaseConfig);
   console.log("Initializing Auth");

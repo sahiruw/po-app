@@ -52,7 +52,8 @@
     "react-navigation-header-buttons": "^11.0.0",
     "react-redux": "^8.1.2",
     "redux": "^4.2.1",
-    "rn-perfect-sketch-canvas": "^0.3.0"
+    "rn-perfect-sketch-canvas": "^0.3.0",
+    "expo-dev-client": "~2.4.11"
   },
   "devDependencies": {
     "@babel/core": "^7.20.0"

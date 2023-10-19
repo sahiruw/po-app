@@ -16,32 +16,17 @@ import userService from "../services/userService";
 import AuthProvider, { AuthContext } from "../contextStore/AuthProvider";
 import { AlertNotificationRoot } from "react-native-alert-notification";
 
-import * as Location from "expo-location";
-import * as Permissions from "expo-permissions";
-import * as TaskManager from "expo-task-manager";
 
-import { rtdatabase } from "../config/firebase";
-import { ref, set } from "firebase/database";
 import { AppConstants } from "../assets/constants";
 
-const LOCATION_TASK_NAME = "background-location-task";
+
+
 
 function RootNavigator() {
   const { user, setUser } = useContext(AuthContext);
   const [loading, setLoading] = useState(true);
 
-  TaskManager.defineTask(LOCATION_TASK_NAME, async ({ data, error }) => {
-    if (error) {
-      console.error(error);
-      return;
-    }
-    if (data && user?.role == AppConstants.EmployeeRoles.Postman) {
-      const { locations } = data;
-      const lat = locations[0].coords.latitude;
-      const long = locations[0].coords.longitude;
-      saveLocationToFirebase(lat, long);
-    }
-  });
+  
   
   useEffect(() => {
     const unsubscribe = onAuthStateChanged(auth, async (authenticatedUser) => {
@@ -71,46 +56,10 @@ function RootNavigator() {
   }, []);
 
   
-  const saveLocationToFirebase = async (lat, long) => {
-
-    const userId = user?.uid;
-
-    try {
-      const locationRef = ref(rtdatabase, `userLocation/${userId}`);
-      await set(locationRef, {
-        lat,
-        long,
-      });
-      console.log("Location saved to Firebase for user ID:", userId);
-    } catch (error) {
-      console.error("Error saving location to Firebase:", error);
-    }
-  };
 
 
 
 
-  useEffect(() => {
-    const getLocationPermission = async () => {
-      const { status } = await Location.requestBackgroundPermissionsAsync();
-
-      if (status === "granted") {
-        // Start the location updates
-
-        await Location.startLocationUpdatesAsync(LOCATION_TASK_NAME, {
-          enableHighAccuracy: true,
-          distanceInterval: 1,
-          timeInterval: 5000,
-        });
-      } else {
-        console.error("Location services needed");
-      }
-    };
-
-    if (user?.role == AppConstants.EmployeeRoles.Postman) {
-       getLocationPermission();
-    }
-  }, []);
 
   if (loading) {
     return <LoadingScreen />;

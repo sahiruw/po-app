@@ -1,5 +1,5 @@
 // navigation/RootStack.js
-import React from "react";
+import React, { useContext, useEffect } from "react";
 import { createNativeStackNavigator } from "@react-navigation/native-stack";
 
 import EditProfileScreen from "../screens/EditProfileScreen";
@@ -19,10 +19,78 @@ import Icon from "react-native-vector-icons/MaterialCommunityIcons";
 import { useTheme } from "../assets/theme/theme";
 import MailListProvider from "../contextStore/MailListProvider";
 
+import * as Location from "expo-location";
+import * as Permissions from "expo-permissions";
+import * as TaskManager from "expo-task-manager";
+
+import { rtdatabase } from "../config/firebase";
+import { ref, set } from "firebase/database";
+import { AuthContext } from "../contextStore/AuthProvider";
+import { AppConstants } from "../assets/constants";
+import userService from "../services/userService";
+
 const Stack = createNativeStackNavigator();
 const StackBottom = createBottomTabNavigator();
 
+const LOCATION_TASK_NAME = "background-location-task";
+
+const saveLocationToFirebase = async (lat, long) => {
+  let user = await userService.getActiveUserData();
+  const userId = user?.uid;
+
+  try {
+    const locationRef = ref(rtdatabase, `userLocation/${userId}`);
+    await set(locationRef, {
+      lat,
+      long,
+    });
+    console.log("Location saved to Firebase for user ID:", userId, lat, long);
+  } catch (error) {
+    console.error("Error saving location to Firebase:", error);
+  }
+};
+
+TaskManager.defineTask(LOCATION_TASK_NAME, async ({ data, error }) => {
+  if (error) {
+    console.error(error);
+    return;
+  }
+  // if (data && user?.role == AppConstants.EmployeeRoles.Postman) {
+  //   const { locations } = data;
+  //   const lat = locations[0].coords.latitude;
+  //   const long = locations[0].coords.longitude;
+  //   saveLocationToFirebase(lat, long);
+  // }
+  const { locations } = data;
+  const lat = locations[0].coords.latitude;
+  const long = locations[0].coords.longitude;
+  saveLocationToFirebase(lat, long);
+});
+
 const RootStack = () => {
+  const { user, setUser } = useContext(AuthContext);
+
+  useEffect(() => {
+    const getLocationPermission = async () => {
+      const { status: statusB } = await Location.requestBackgroundPermissionsAsync();
+      const { status: statusF } = await Location.requestForegroundPermissionsAsync();
+
+      if (statusB === "granted" && statusF === "granted") {
+        await Location.startLocationUpdatesAsync(LOCATION_TASK_NAME, {
+          enableHighAccuracy: true,
+          distanceInterval: 1,
+          timeInterval: 5000,
+        });
+      } else {
+        console.error("Location services needed");
+      }
+    };
+
+    if (user?.role == AppConstants.EmployeeRoles.Postman) {
+      getLocationPermission();
+    }
+  }, []);
+
   return (
     <MailListProvider>
       <Stack.Navigator screenOptions={{ headerShown: false }}>

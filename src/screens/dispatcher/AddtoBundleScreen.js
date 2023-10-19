@@ -42,7 +42,8 @@ export default function App() {
 
   const getBundles = async () => {
     setIsLoading(true);
-    let bundles = await bundleService.getBundleData();
+    try {
+      let bundles = await bundleService.getBundleData();
     setBundles(bundles);
     let bundleIds = [];
 
@@ -58,6 +59,15 @@ export default function App() {
     setBundleIds(bundleIds);
 
     console.log("Bundles for today", bundles);
+    }
+    catch(e){
+      Toast.show({
+        type: ALERT_TYPE.DANGER,
+        title: "Error",
+        textBody: "Error fetching bundles",
+        button: "close",
+      });
+    }
     setIsLoading(false);
   };
 
@@ -114,12 +124,22 @@ export default function App() {
       return;
     }
     setIsLoading(true);
-    await bundleService.dispatchBundle(
-      selectedBundleId,
-      mailsOfSelectedBundle,
-    );
-    await getBundles();
-    setSelectedBundleId(null);
+    try{
+      await bundleService.updateBundleStatus(
+        selectedBundleId,
+        mailsOfSelectedBundle,
+      );
+      await getBundles();
+      setSelectedBundleId(null);
+    }
+    catch(e){
+      Toast.show({
+        type: ALERT_TYPE.DANGER,
+        title: "Error",
+        textBody: "Error submitting bundle",
+        button: "close",
+      });
+    }
     setIsLoading(false);
   };
 
@@ -141,12 +161,22 @@ export default function App() {
 
   const handleMailItemClick = (item) => {
     setIsLoading(true);
-    const getMailData = async (id) => {
-      let mail = await mailItemService.getDetailsofMailItemByID(id);
-      console.log(mail);
-      setSelectedMailItem(mail);
-    };
-    getMailData(String(item).trim());
+    try {
+      const getMailData = async (id) => {
+        let mail = await mailItemService.getDetailsofMailItemByID(id);
+        console.log(mail);
+        setSelectedMailItem(mail);
+      };
+      getMailData(String(item).trim());
+    }
+    catch(e){
+      Toast.show({
+        type: ALERT_TYPE.DANGER,
+        title: "Error",
+        textBody: "Error fetching mail data",
+        button: "close",
+      });
+    }
     setIsLoading(false);
   };
 

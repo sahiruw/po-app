@@ -14,8 +14,19 @@ export default {
       backgroundColor: "#ffffff",
     },
     assetBundlePatterns: ["**/*"],
+    
+    "androidStatusBar": {
+      "backgroundColor": "#C2185B",
+      "translucent": false
+    },
+    
     ios: {
       supportsTablet: true,
+      "config": {
+        "googleMaps": {
+          "apiKey": process.env.API_KEY
+        }
+      }
     },
     android: {
       adaptiveIcon: {
@@ -23,6 +34,11 @@ export default {
         backgroundColor: "#ffffff",
       },
       "package": "com.poapp2.app",
+      "config": {
+        "googleMaps": {
+          "apiKey": process.env.API_KEY
+        }
+      }
     },
     web: {
       favicon: "./src/assets/app-logo.png",

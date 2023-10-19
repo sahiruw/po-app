@@ -17,7 +17,6 @@ const HomeScreen = () => {
       <View style={styles.container}>
         <ClockComponent />
 
-        <ProfileCard />
         <ProfileCard /> 
         <DeliveryStatusCard />
       </View>

@@ -6,12 +6,12 @@ import { AuthContext } from "../contextStore/AuthProvider";
 
 const ProfileCard = () => {
     const { user, setUser } = useContext(AuthContext);
-
+  
   return (
     <View style={styles.container}>
       <Avatar.Image source={{ uri: user?.profile_picture }} size={100} />
       <View style= {styles.userData}>
-        <Text>Name: {userUtils.formatName(user?.name)}</Text>
+        <Text>Name: {user?.name}</Text>
         <Text>Email: {user?.email}</Text>
         <Text>Role: {user?.role}</Text>
 

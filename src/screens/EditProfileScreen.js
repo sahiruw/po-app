@@ -16,7 +16,6 @@ import LoadingScreen from "./LoadingScreen";
 const EditProfileScreen = ({ route, navigation }) => {
   const [image, setImage] = useState(null);
   const [firstName, setFirstName] = useState(""); // Track first name separately
-  const [lastName, setLastName] = useState(""); // Track last name separately
   const { theme } = useTheme();
   const { user, setUser } = useContext(AuthContext);
   const [loading, setLoading] = useState(false);
@@ -24,8 +23,7 @@ const EditProfileScreen = ({ route, navigation }) => {
 
   useEffect(() => {
     setImage(user?.profile_picture);
-    setFirstName(user?.name?.first_name || ""); // Set the initial first name
-    setLastName(user?.name?.last_name || ""); // Set the initial last name
+    setFirstName(user?.name || ""); 
   }, []);
 
   const pickImage = async () => {
@@ -36,7 +34,7 @@ const EditProfileScreen = ({ route, navigation }) => {
       quality: 1,
     });
 
-    if (!result.cancelled) {
+    if (!result.canceled) {
       setImage(result.assets[0].uri);
       setProfilePicChanged(true);
     }
@@ -48,10 +46,7 @@ const EditProfileScreen = ({ route, navigation }) => {
     // Combine first name and last name into the user object
     const updatedUser = {
       ...user,
-      name: {
-        first_name: firstName,
-        last_name: lastName,
-      },
+      name: firstName,
       profile_picture: image,
     };
 
@@ -73,18 +68,11 @@ const EditProfileScreen = ({ route, navigation }) => {
           <Image source={{ uri: image }} style={styles.profileImage} />
         </TouchableOpacity>
 
-        <Text style={styles.label}>First Name</Text>
+        <Text style={styles.label}>Name</Text>
         <TextInput
           style={styles.input}
           value={firstName} // Use the state variable to set the initial value
           onChangeText={(text) => setFirstName(text)} // Update the first name
-        />
-
-        <Text style={styles.label}>Last Name</Text>
-        <TextInput
-          style={styles.input}
-          value={lastName} // Use the state variable to set the initial value
-          onChangeText={(text) => setLastName(text)} // Update the last name
         />
 
         <View style={{ top: 20 }}>

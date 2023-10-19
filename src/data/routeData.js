@@ -10,7 +10,7 @@ const getRoute = async (dateKey, postmanID) => {
   let routeRaw = await AsyncStorage.getItem("route");
   let routeStored = JSON.parse(routeRaw);
 
-  if (routeStored?.dateKey === dateKey && false) {
+  if (routeStored?.dateKey === dateKey) {
     console.log("route from  async");
     // console.log(routeStored);
 
@@ -24,7 +24,6 @@ const getRoute = async (dateKey, postmanID) => {
     if (docSnap.exists()) {
       let docSnapData = docSnap.data();
       let assignedMails = docSnapData[postmanID];
-
       if (assignedMails) {
         await mailItemData.updateStatusOfMailItems(
           assignedMails,
@@ -49,7 +48,7 @@ const getRoute = async (dateKey, postmanID) => {
       }
 
       let route = { dateKey, uid: postmanID, mailItemData: mailsForToday };
-      // console.log(route);
+
       console.log("route from firebase")
       saveRoute(route);
       return route;
