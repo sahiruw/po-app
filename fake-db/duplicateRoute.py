@@ -10,16 +10,16 @@ firebase_admin.initialize_app(cred)
 db = firestore.client()
 
 # ID of the source document you want to duplicate
-source_document_id = "oMS1dBLfgnMhuaFqdadLNFIeTFS2"
+source_document_id = "18102023"
 
 # Reference to the source document
-source_doc_ref = db.collection("employees").document(source_document_id)
+source_doc_ref = db.collection("Route").document(source_document_id)
 
 # Get the data from the source document
 source_data = source_doc_ref.get().to_dict()
 
 
-new_document_ref = db.collection("employees").document("DO7ugUmcoWTKnmnkTH3RiEAQtvi2")
+new_document_ref = db.collection("Route").document("20102023")
 
 # Set the data of the new document with the data from the source document
 new_document_ref.set(source_data)

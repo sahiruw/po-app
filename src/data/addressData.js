@@ -8,9 +8,10 @@ const getDetailsofAddress = async (addressId) => {
     if (docSnap.exists()) {
         return docSnap.data();
     }
-    console.log("No address document!");
+    // console.log("No address document!");
     return null;
     }
+
 
 const addAddress = async (address) => {
     const addressCollectionRef = collection(db, "Address");

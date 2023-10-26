@@ -41,8 +41,8 @@ const ScanArrived = ({ navigation }) => {
     const retrieveBundle = async () => {
       setLoading(true);
       let bundleData = await bundleService.getBundleDataByID(data);
-      // console.log(bundleData);
-      // console.log(bundleData.destination_post_office_id == user.postoffice)
+      console.log(bundleData);
+      console.log(user.postoffice);
       let isValidBundle =
         bundleData?.destination_post_office_id == user.postoffice;
 

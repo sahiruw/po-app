@@ -12,7 +12,7 @@ fake = Faker()
 # Define the coordinates for the University of Moratuwa
 base_locs = {
     "Katubedda": {
-        'lat': 6.794052,
+        'lat': 6.7913872,
         'lng': 79.901683
     },
     "Galle": {
@@ -33,7 +33,7 @@ base_locs = {
 poIds = {
     "Galle": "rg-4",
     "Matara": "rg-5",
-    "Katubedda": "rg-1",
+    "Katubedda": "rg-10",
     "Moratuwa": "rg-2",
 }
 # Define a radius (in meters) around the University to search for random addresses
@@ -62,8 +62,9 @@ db = firestore.client()
 source_doc_ref = db.collection("Address")
 added = []
 
-for i in range(200):
-    city = random.choice(list(base_locs.keys()))
+for i in range(5):
+    # city = random.choice(list(base_locs.keys()))
+    city = "Katubedda"
 
     address = randomAddress(city)
     while address in added:
@@ -76,7 +77,8 @@ for i in range(200):
         "Address_line_1": fake.street_name(),
         "Address_line_2": fake.city(),
         "City": city,
-        "RegionID": poIds[city]
+        "RegionID": poIds[city],
+        "District": "Colombo"
     }
     print(ads)
     print()

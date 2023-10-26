@@ -9,7 +9,7 @@ import DeliveryStatusCard from "../../components/DeliveryStatusCard";
 import ClockComponent from "../../components/ClockComponent";
 
 const HomeScreen = () => {
-  const { user, setUser } = useContext(AuthContext);
+  // const { user, setUser } = useContext(AuthContext);
 
   return (
     <>

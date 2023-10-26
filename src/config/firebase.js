@@ -13,7 +13,7 @@ import {
   getStorage,
 
 } from "firebase/storage";
-import Constants from "expo-constants";
+// import Constants from "expo-constants";
 
 import ReactNativeAsyncStorage from "@react-native-async-storage/async-storage";
 import { getDatabase } from "firebase/database";

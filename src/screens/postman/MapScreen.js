@@ -175,6 +175,7 @@ const MapScreen = () => {
 
         {/* <Text>{JSON.stringify(mailList[0])}</Text> */}
 
+
         <MapView
           
           style={styles.map}

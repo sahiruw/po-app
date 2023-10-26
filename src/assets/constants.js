@@ -37,7 +37,7 @@ export const AppConstants = {
   //"To be Dispatched", "To be Delivered", "To be Returned", "Out for Delivery", "Delivery Cancelled", "Returned", "Delivered", "Dispatched"
   MailItemStatus: {
     TobeDispatched: "To be Dispatched",
-    TobeDelivered: "To be Delivered",
+    TobeDelivered: "To be delivered",
     TobeReturned: "To be Returned",
     OutforDelivery: "Out for Delivery",
     DeliveryCancelled: "Delivery Cancelled",

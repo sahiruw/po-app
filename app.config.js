@@ -15,10 +15,10 @@ export default {
     },
     assetBundlePatterns: ["**/*"],
     
-    "androidStatusBar": {
-      "backgroundColor": "#C2185B",
-      "translucent": false
-    },
+    // "androidStatusBar": {
+    //   "backgroundColor": "#C2185B",
+    //   "translucent": false
+    // },
     
     ios: {
       supportsTablet: true,
