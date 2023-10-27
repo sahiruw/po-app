@@ -167,7 +167,7 @@ const MailListTabs = () => {
             onPress={() => {handleMarkAttempt(item)}}
             >
               <View style={styles.mailItem}>
-                <Text>{item.name}</Text>
+                <Text>{item?.mailItem?.recipient_name}</Text>
                 <Text>{String(item.type).toUpperCase()}</Text>
               </View>
             </TouchableOpacity>
